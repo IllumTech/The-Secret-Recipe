@@ -1,19 +1,28 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { Product } from '@/lib/types';
 import Button from '@/components/ui/Button';
 
 interface ProductCardProps {
   product: Product;
   onAddToCart?: (product: Product) => void;
+  onViewDetails?: (product: Product) => void;
 }
 
-export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
+export default function ProductCard({ product, onAddToCart, onViewDetails }: ProductCardProps) {
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
+  
+  const handleClick = () => {
+    if (onViewDetails) {
+      onViewDetails(product);
+    }
+  };
   
   return (
     <div className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 animate-fade-in">
-      <Link href={`/productos/${product.id}`}>
+      <div 
+        onClick={handleClick}
+        className="cursor-pointer"
+      >
         <div className="relative h-56 w-full bg-gradient-to-br from-pink-100 to-purple-100 overflow-hidden">
           {product.imageUrl ? (
             <Image
@@ -33,14 +42,17 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
             </span>
           </div>
         </div>
-      </Link>
+      </div>
       
       <div className="p-5">
-        <Link href={`/productos/${product.id}`}>
+        <div 
+          onClick={handleClick}
+          className="cursor-pointer"
+        >
           <h3 className="text-lg font-bold text-gray-900 hover:text-primary-600 transition-colors line-clamp-2 min-h-[3.5rem] font-display">
             {product.name}
           </h3>
-        </Link>
+        </div>
         
         {product.description && (
           <p className="text-sm text-gray-600 mt-2 line-clamp-2">

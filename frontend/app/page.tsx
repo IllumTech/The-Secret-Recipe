@@ -1,19 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProductGrid from '@/components/products/ProductGrid';
+import ProductDetail from '@/components/products/ProductDetail';
+import Modal from '@/components/ui/Modal';
 import { mockProducts } from '@/lib/mock-data';
 import { Product } from '@/lib/types';
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [displayedProducts, setDisplayedProducts] = useState(mockProducts);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredProducts = selectedCategory === 'all'
     ? mockProducts
     : mockProducts.filter(p => p.category === selectedCategory);
 
-  const handleAddToCart = (product: Product) => {
-    alert(`${product.name} agregado al carrito`);
+  useEffect(() => {
+    // Iniciar transición de salida
+    setIsTransitioning(true);
+    
+    // Después de 400ms (fade out), actualizar productos
+    const updateTimer = setTimeout(() => {
+      setDisplayedProducts(filteredProducts);
+    }, 400);
+
+    // Después de 450ms, iniciar transición de entrada
+    const transitionTimer = setTimeout(() => {
+      setIsTransitioning(false);
+    }, 450);
+
+    return () => {
+      clearTimeout(updateTimer);
+      clearTimeout(transitionTimer);
+    };
+  }, [selectedCategory]);
+
+  const handleAddToCart = (product: Product, quantity: number = 1) => {
+    alert(`${quantity}x ${product.name} agregado al carrito`);
+  };
+
+  const handleViewDetails = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedProduct(null), 300);
   };
 
   return (
@@ -67,17 +103,17 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="container-custom py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-pink-50 to-white shadow-lg hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">✨</div>
             <h3 className="text-xl font-bold mb-2 font-display">Ingredientes Premium</h3>
             <p className="text-gray-600">Solo usamos los mejores ingredientes naturales</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-purple-50 to-white shadow-lg hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🎨</div>
             <h3 className="text-xl font-bold mb-2 font-display">Hecho a Mano</h3>
             <p className="text-gray-600">Cada producto es una obra de arte artesanal</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+          <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-white shadow-lg hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🚚</div>
             <h3 className="text-xl font-bold mb-2 font-display">Entrega Rápida</h3>
             <p className="text-gray-600">Llevamos la felicidad directo a tu puerta</p>
@@ -140,11 +176,30 @@ export default function HomePage() {
         </div>
 
         {/* Product Grid */}
-        <ProductGrid
-          products={filteredProducts}
-          onAddToCart={handleAddToCart}
-        />
+        <div 
+          className={`transition-all duration-700 ease-in-out ${
+            isTransitioning 
+              ? 'opacity-0 transform scale-95 blur-sm' 
+              : 'opacity-100 transform scale-100 blur-0'
+          }`}
+        >
+          <ProductGrid
+            products={displayedProducts}
+            onAddToCart={handleAddToCart}
+            onViewDetails={handleViewDetails}
+          />
+        </div>
       </section>
+
+      {/* Product Detail Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        {selectedProduct && (
+          <ProductDetail
+            product={selectedProduct}
+            onAddToCart={handleAddToCart}
+          />
+        )}
+      </Modal>
 
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-accent-500 to-primary-600 text-white py-20 my-16">

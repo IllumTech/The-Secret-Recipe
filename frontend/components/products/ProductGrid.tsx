@@ -6,9 +6,10 @@ interface ProductGridProps {
   products: Product[];
   isLoading?: boolean;
   onAddToCart?: (product: Product) => void;
+  onViewDetails?: (product: Product) => void;
 }
 
-export default function ProductGrid({ products, isLoading, onAddToCart }: ProductGridProps) {
+export default function ProductGrid({ products, isLoading, onAddToCart, onViewDetails }: ProductGridProps) {
   if (isLoading) {
     return <Loading />;
   }
@@ -23,12 +24,21 @@ export default function ProductGrid({ products, isLoading, onAddToCart }: Produc
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {products.map((product) => (
-        <ProductCard
+      {products.map((product, index) => (
+        <div
           key={product.id}
-          product={product}
-          onAddToCart={onAddToCart}
-        />
+          className="animate-fade-in-up"
+          style={{
+            animationDelay: `${index * 80}ms`,
+            animationFillMode: 'both'
+          }}
+        >
+          <ProductCard
+            product={product}
+            onAddToCart={onAddToCart}
+            onViewDetails={onViewDetails}
+          />
+        </div>
       ))}
     </div>
   );
