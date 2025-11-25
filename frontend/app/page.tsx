@@ -103,17 +103,17 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="container-custom py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-pink-50 to-white shadow-lg hover:shadow-xl transition-shadow">
+          <div className="text-center p-6 rounded-2xl bg-white border-2 border-gray-200 shadow-lg hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">✨</div>
             <h3 className="text-xl font-bold mb-2 font-display">Ingredientes Premium</h3>
             <p className="text-gray-600">Solo usamos los mejores ingredientes naturales</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-purple-50 to-white shadow-lg hover:shadow-xl transition-shadow">
+          <div className="text-center p-6 rounded-2xl bg-white border-2 border-gray-200 shadow-lg hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🎨</div>
             <h3 className="text-xl font-bold mb-2 font-display">Hecho a Mano</h3>
             <p className="text-gray-600">Cada producto es una obra de arte artesanal</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-white shadow-lg hover:shadow-xl transition-shadow">
+          <div className="text-center p-6 rounded-2xl bg-white border-2 border-gray-200 shadow-lg hover:shadow-xl transition-shadow">
             <div className="text-5xl mb-4">🚚</div>
             <h3 className="text-xl font-bold mb-2 font-display">Entrega Rápida</h3>
             <p className="text-gray-600">Llevamos la felicidad directo a tu puerta</p>

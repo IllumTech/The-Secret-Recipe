@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Product } from '@/lib/types';
-import Button from '@/components/ui/Button';
+import { useState } from 'react';
 
 interface ProductCardProps {
   product: Product;
@@ -10,10 +10,24 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, onAddToCart, onViewDetails }: ProductCardProps) {
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
+  const [quantity, setQuantity] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
   
   const handleClick = () => {
     if (onViewDetails) {
       onViewDetails(product);
+    }
+  };
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setQuantity(prev => prev + 1);
+  };
+
+  const handleSubtract = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (quantity > 0) {
+      setQuantity(prev => prev - 1);
     }
   };
   
@@ -23,7 +37,7 @@ export default function ProductCard({ product, onAddToCart, onViewDetails }: Pro
         onClick={handleClick}
         className="cursor-pointer"
       >
-        <div className="relative h-56 w-full bg-gradient-to-br from-pink-100 to-purple-100 overflow-hidden">
+        <div className="relative h-56 w-full bg-white overflow-hidden">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
@@ -36,10 +50,64 @@ export default function ProductCard({ product, onAddToCart, onViewDetails }: Pro
               {categoryEmoji}
             </div>
           )}
-          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
             <span className="text-sm font-semibold text-primary-600 capitalize">
               {categoryEmoji} {product.category}
             </span>
+          </div>
+
+          {/* Controles de cantidad - Esquina superior derecha */}
+          <div 
+            className="absolute top-3 right-3 z-10"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {quantity === 0 ? (
+              // Estado inicial: Solo botón +
+              <div className="relative">
+                <button
+                  onClick={handleAdd}
+                  className="w-10 h-10 bg-white hover:bg-primary-500 text-primary-600 hover:text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center font-bold text-xl"
+                >
+                  +
+                </button>
+                
+                {/* Tooltip "Agregar" en hover */}
+                {isHovered && (
+                  <div className="absolute top-12 right-0 bg-gray-900 text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap animate-fade-in">
+                    Agregar
+                    <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Estado con cantidad: Mostrar controles completos
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full shadow-lg px-2 py-1">
+                <button
+                  onClick={handleSubtract}
+                  className="w-8 h-8 bg-white hover:bg-red-500 hover:shadow-lg text-red-500 hover:text-white rounded-full transition-all duration-200 flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
+                  title={quantity === 1 ? 'Eliminar' : 'Restar'}
+                >
+                  {quantity === 1 ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  ) : '−'}
+                </button>
+                
+                <span className="min-w-[24px] text-center font-bold text-gray-900">
+                  {quantity}
+                </span>
+                
+                <button
+                  onClick={handleAdd}
+                  className="w-8 h-8 bg-white hover:bg-primary-500 hover:shadow-lg text-primary-600 hover:text-white rounded-full transition-all duration-200 flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
+                  title="Agregar más"
+                >
+                  +
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -60,24 +128,10 @@ export default function ProductCard({ product, onAddToCart, onViewDetails }: Pro
           </p>
         )}
         
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              ${product.price.toFixed(2)}
-            </span>
-          </div>
-          
-          {onAddToCart && (
-            <Button
-              onClick={() => onAddToCart(product)}
-              className="text-sm px-4 py-2"
-            >
-              <span className="flex items-center space-x-1">
-                <span>Agregar</span>
-                <span>🛒</span>
-              </span>
-            </Button>
-          )}
+        <div className="mt-4">
+          <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+            ${product.price.toFixed(2)}
+          </span>
         </div>
       </div>
     </div>

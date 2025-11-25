@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-gradient-to-br from-pink-50 via-white to-purple-50 text-gray-900 antialiased;
+    @apply bg-white text-gray-900 antialiased;
   }
   
   h1, h2, h3, h4, h5, h6 {
