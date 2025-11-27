@@ -5,7 +5,6 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ProductDetail from '@/components/products/ProductDetail';
 import { mockProducts } from '@/lib/mock-data';
-import { Product } from '@/lib/types';
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -14,10 +13,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   if (!product) {
     notFound();
   }
-
-  const handleAddToCart = (product: Product, quantity: number) => {
-    alert(`${quantity}x ${product.name} agregado al carrito`);
-  };
 
   return (
     <div className="container-custom py-8">
@@ -28,10 +23,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         ← Volver al catálogo
       </Link>
 
-      <ProductDetail
-        product={product}
-        onAddToCart={handleAddToCart}
-      />
+      <ProductDetail product={product} />
     </div>
   );
 }

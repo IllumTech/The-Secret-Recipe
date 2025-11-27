@@ -38,20 +38,6 @@ export default function HomePage() {
     };
   }, [selectedCategory]);
 
-  const handleAddToCart = (product: Product, quantity: number = 1) => {
-    alert(`${quantity}x ${product.name} agregado al carrito`);
-  };
-
-  const handleViewDetails = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setTimeout(() => setSelectedProduct(null), 300);
-  };
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -183,21 +169,20 @@ export default function HomePage() {
               : 'opacity-100 transform scale-100 blur-0'
           }`}
         >
-          <ProductGrid
+          <ProductGrid 
             products={displayedProducts}
-            onAddToCart={handleAddToCart}
-            onViewDetails={handleViewDetails}
+            onProductClick={(product) => {
+              setSelectedProduct(product);
+              setIsModalOpen(true);
+            }}
           />
         </div>
       </section>
 
       {/* Product Detail Modal */}
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {selectedProduct && (
-          <ProductDetail
-            product={selectedProduct}
-            onAddToCart={handleAddToCart}
-          />
+          <ProductDetail product={selectedProduct} />
         )}
       </Modal>
 

@@ -4,20 +4,20 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
 import Button from '@/components/ui/Button';
+import { useCart } from '@/hooks/useCart';
 
 interface ProductDetailProps {
   product: Product;
-  onAddToCart?: (product: Product, quantity: number) => void;
 }
 
-export default function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
+export default function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
 
   const handleAddToCart = () => {
-    if (onAddToCart) {
-      onAddToCart(product, quantity);
-    }
+    addItem(product, quantity);
+    alert(`${quantity} ${product.name} agregado(s) al carrito!`);
   };
 
   const incrementQuantity = () => setQuantity(q => q + 1);

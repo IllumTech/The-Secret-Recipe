@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import CartButton from '@/components/cart/CartButton';
 
 export default function Header() {
   return (
@@ -26,13 +29,6 @@ export default function Header() {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link 
-              href="/carrito" 
-              className="text-gray-700 hover:text-primary-600 font-medium transition-colors relative group"
-            >
-              Carrito
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link 
               href="/admin" 
               className="text-gray-700 hover:text-primary-600 font-medium transition-colors relative group"
             >
@@ -41,13 +37,7 @@ export default function Header() {
             </Link>
           </nav>
           
-          <Link 
-            href="/carrito" 
-            className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2"
-          >
-            <span className="text-xl">🛒</span>
-            <span>Carrito</span>
-          </Link>
+          <CartButton />
         </div>
       </div>
     </header>

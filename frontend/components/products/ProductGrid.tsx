@@ -5,11 +5,10 @@ import Loading from '@/components/ui/Loading';
 interface ProductGridProps {
   products: Product[];
   isLoading?: boolean;
-  onAddToCart?: (product: Product) => void;
-  onViewDetails?: (product: Product) => void;
+  onProductClick?: (product: Product) => void;
 }
 
-export default function ProductGrid({ products, isLoading, onAddToCart, onViewDetails }: ProductGridProps) {
+export default function ProductGrid({ products, isLoading, onProductClick }: ProductGridProps) {
   if (isLoading) {
     return <Loading />;
   }
@@ -33,10 +32,9 @@ export default function ProductGrid({ products, isLoading, onAddToCart, onViewDe
             animationFillMode: 'both'
           }}
         >
-          <ProductCard
+          <ProductCard 
             product={product}
-            onAddToCart={onAddToCart}
-            onViewDetails={onViewDetails}
+            onProductClick={onProductClick}
           />
         </div>
       ))}
