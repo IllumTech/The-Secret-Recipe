@@ -91,6 +91,14 @@ Resources:
   # Lambda Functions
   ProductsFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
     Properties:
       CodeUri: functions/products/
       Handler: index.handler
@@ -131,6 +139,14 @@ Resources:
 
   OrdersFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
     Properties:
       CodeUri: functions/orders/
       Handler: index.handler
@@ -153,6 +169,14 @@ Resources:
 
   AIGeneratorFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
     Properties:
       CodeUri: functions/ai-generator/
       Handler: index.handler
