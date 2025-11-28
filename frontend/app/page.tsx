@@ -4,19 +4,21 @@ import { useState, useEffect } from 'react';
 import ProductGrid from '@/components/products/ProductGrid';
 import ProductDetail from '@/components/products/ProductDetail';
 import Modal from '@/components/ui/Modal';
-import { mockProducts } from '@/lib/mock-data';
+import { useProducts } from '@/contexts/ProductContext';
 import { Product } from '@/lib/types';
 
 export default function HomePage() {
+  const { products } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [displayedProducts, setDisplayedProducts] = useState(mockProducts);
+  const [displayedProducts, setDisplayedProducts] = useState(products.filter(p => p.isActive));
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const activeProducts = products.filter(p => p.isActive);
   const filteredProducts = selectedCategory === 'all'
-    ? mockProducts
-    : mockProducts.filter(p => p.category === selectedCategory);
+    ? activeProducts
+    : activeProducts.filter(p => p.category === selectedCategory);
 
   useEffect(() => {
     // Iniciar transición de salida
@@ -180,7 +182,11 @@ export default function HomePage() {
       </section>
 
       {/* Product Detail Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+        title={selectedProduct?.name || 'Detalle del Producto'}
+      >
         {selectedProduct && (
           <ProductDetail product={selectedProduct} />
         )}

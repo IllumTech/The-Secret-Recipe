@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { CartProvider } from '@/contexts/CartContext';
+import { ProductProvider } from '@/contexts/ProductContext';
+import ConditionalLayout from '@/components/layout/ConditionalLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,15 +20,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
-        <CartProvider>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-grow">
+        <ProductProvider>
+          <CartProvider>
+            <ConditionalLayout>
               {children}
-            </main>
-            <Footer />
-          </div>
-        </CartProvider>
+            </ConditionalLayout>
+          </CartProvider>
+        </ProductProvider>
       </body>
     </html>
   );
