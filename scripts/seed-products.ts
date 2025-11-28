@@ -100,11 +100,11 @@ async function createProduct(product: Product): Promise<void> {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json() as { error?: string };
       throw new Error(error.error || `HTTP error! status: ${response.status}`);
     }
 
-    const created = await response.json();
+    const created = await response.json() as { name: string; id: string };
     console.log(`✅ Creado: ${created.name} (${created.id})`);
   } catch (error) {
     console.error(`❌ Error creando ${product.name}:`, error);

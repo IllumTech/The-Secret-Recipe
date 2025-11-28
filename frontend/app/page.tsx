@@ -38,7 +38,7 @@ export default function HomePage() {
       clearTimeout(updateTimer);
       clearTimeout(transitionTimer);
     };
-  }, [selectedCategory]);
+  }, [selectedCategory, products]);
 
   return (
     <div className="min-h-screen">
