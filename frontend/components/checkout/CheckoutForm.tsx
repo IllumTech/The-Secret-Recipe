@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
 import * as api from '@/lib/api';
+import OrderConfirmationModal from './OrderConfirmationModal';
 
 interface FormData {
   customerName: string;
@@ -15,11 +16,17 @@ interface FormData {
   zipCode: string;
 }
 
-export default function CheckoutForm() {
+interface CheckoutFormProps {
+  onOrderComplete?: () => void;
+}
+
+export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
   const router = useRouter();
   const { items, totalAmount, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [showModal, setShowModal] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
   
   const [formData, setFormData] = useState<FormData>({
     customerName: '',
@@ -98,15 +105,24 @@ export default function CheckoutForm() {
       };
 
       const order = await api.createOrder(orderData);
+      console.log('Order created:', order);
       
+      setOrderNumber(order.orderNumber);
+      console.log('Setting modal to true with order number:', order.orderNumber);
+      setShowModal(true);
+      onOrderComplete?.();
       clearCart();
-      router.push(`/confirmacion?orderNumber=${order.orderNumber}`);
     } catch (error) {
       console.error('Error submitting order:', error);
       alert('Error al procesar el pedido. Por favor intenta de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    router.push('/');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,8 +135,15 @@ export default function CheckoutForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-white rounded-lg shadow-lg p-6">
+    <>
+      <OrderConfirmationModal 
+        isOpen={showModal}
+        orderNumber={orderNumber}
+        onClose={handleCloseModal}
+      />
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Información del Cliente</h2>
         
         <div className="space-y-4">
@@ -281,6 +304,7 @@ export default function CheckoutForm() {
       >
         {isSubmitting ? 'Procesando...' : 'Confirmar Pedido'}
       </button>
-    </form>
+      </form>
+    </>
   );
 }

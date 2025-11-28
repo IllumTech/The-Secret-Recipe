@@ -2,20 +2,21 @@
 
 import { useCart } from '@/hooks/useCart';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import CheckoutForm from '@/components/checkout/CheckoutForm';
 
 export default function CheckoutPage() {
   const { items, totalAmount, totalItems } = useCart();
   const router = useRouter();
+  const [orderCompleted, setOrderCompleted] = useState(false);
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (items.length === 0 && !orderCompleted) {
       router.push('/carrito');
     }
-  }, [items, router]);
+  }, [items, router, orderCompleted]);
 
-  if (items.length === 0) {
+  if (items.length === 0 && !orderCompleted) {
     return null;
   }
 
@@ -28,7 +29,7 @@ export default function CheckoutPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div className="lg:col-span-2">
-            <CheckoutForm />
+            <CheckoutForm onOrderComplete={() => setOrderCompleted(true)} />
           </div>
 
           <div className="lg:col-span-1">
