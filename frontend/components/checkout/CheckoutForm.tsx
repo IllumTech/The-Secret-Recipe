@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
+import * as api from '@/lib/api';
 
 interface FormData {
   customerName: string;
@@ -77,11 +78,10 @@ export default function CheckoutForm() {
     setIsSubmitting(true);
 
     try {
-      // TODO: Replace with actual API call
       const orderData = {
         customerName: formData.customerName,
-        email: formData.email,
-        phone: formData.phone,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
         deliveryAddress: {
           street: formData.street,
           city: formData.city,
@@ -89,24 +89,18 @@ export default function CheckoutForm() {
           zipCode: formData.zipCode,
         },
         items: items.map(item => ({
-          productId: item.product.id,
-          productName: item.product.name,
+          id: item.product.id,
+          name: item.product.name,
           quantity: item.quantity,
           price: item.product.price,
+          image: item.product.image,
         })),
-        totalAmount,
       };
 
-      console.log('Order data:', orderData);
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Generate mock order number
-      const orderNumber = `ORD-${Date.now()}`;
+      const order = await api.createOrder(orderData);
       
       clearCart();
-      router.push(`/confirmacion?orderNumber=${orderNumber}`);
+      router.push(`/confirmacion?orderNumber=${order.orderNumber}`);
     } catch (error) {
       console.error('Error submitting order:', error);
       alert('Error al procesar el pedido. Por favor intenta de nuevo.');

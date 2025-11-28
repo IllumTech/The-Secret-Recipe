@@ -1,48 +1,63 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
+import useSWR from 'swr';
 import { Product } from '@/lib/types';
-import { mockProducts } from '@/lib/mock-data';
+import * as api from '@/lib/api';
 
 interface ProductContextType {
   products: Product[];
-  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>) => void;
-  updateProduct: (id: string, product: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
+  isLoading: boolean;
+  error: any;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>) => Promise<Product>;
+  updateProduct: (id: string, product: Partial<Product>) => Promise<Product>;
+  deleteProduct: (id: string) => Promise<void>;
+  refreshProducts: () => void;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const { data: products = [], error, isLoading, mutate } = useSWR<Product[]>(
+    'products',
+    api.getProducts,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
 
-  const addProduct = (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>) => {
-    const newProduct: Product = {
-      ...productData,
-      id: Date.now().toString(),
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setProducts(prev => [...prev, newProduct]);
+  const addProduct = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>) => {
+    const newProduct = await api.createProduct(productData);
+    mutate(); // Refresh products list
+    return newProduct;
   };
 
-  const updateProduct = (id: string, productData: Partial<Product>) => {
-    setProducts(prev => prev.map(p => 
-      p.id === id 
-        ? { ...p, ...productData, updatedAt: new Date().toISOString() }
-        : p
-    ));
+  const updateProduct = async (id: string, productData: Partial<Product>) => {
+    const updatedProduct = await api.updateProduct(id, productData);
+    mutate(); // Refresh products list
+    return updatedProduct;
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.map(p => 
-      p.id === id ? { ...p, isActive: false } : p
-    ));
+  const deleteProduct = async (id: string) => {
+    await api.deleteProduct(id);
+    mutate(); // Refresh products list
+  };
+
+  const refreshProducts = () => {
+    mutate();
   };
 
   return (
-    <ProductContext.Provider value={{ products, addProduct, updateProduct, deleteProduct }}>
+    <ProductContext.Provider value={{ 
+      products, 
+      isLoading, 
+      error, 
+      addProduct, 
+      updateProduct, 
+      deleteProduct,
+      refreshProducts 
+    }}>
       {children}
     </ProductContext.Provider>
   );

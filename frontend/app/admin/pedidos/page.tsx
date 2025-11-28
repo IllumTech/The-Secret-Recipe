@@ -2,40 +2,43 @@
 
 import { useState } from 'react';
 import { Package, User, Calendar, DollarSign, Filter } from 'lucide-react';
-
-// Mock orders data - será reemplazado con datos reales de la API
-const mockOrders = [
-  {
-    id: '1',
-    orderNumber: 'ORD-001',
-    customerName: 'Juan Pérez',
-    customerEmail: 'juan@example.com',
-    total: 45.50,
-    status: 'pending',
-    createdAt: new Date('2024-01-15'),
-    items: 3,
-  },
-  {
-    id: '2',
-    orderNumber: 'ORD-002',
-    customerName: 'María García',
-    customerEmail: 'maria@example.com',
-    total: 32.00,
-    status: 'completed',
-    createdAt: new Date('2024-01-14'),
-    items: 2,
-  },
-];
+import useSWR from 'swr';
+import { Order } from '@/lib/types';
+import * as api from '@/lib/api';
 
 type OrderStatus = 'all' | 'pending' | 'completed' | 'cancelled';
 
 export default function OrdersListPage() {
-  const [orders] = useState(mockOrders);
+  const { data: orders = [], error, isLoading } = useSWR<Order[]>('orders', api.getOrders, {
+    refreshInterval: 30000, // Refresh every 30 seconds
+  });
   const [filterStatus, setFilterStatus] = useState<OrderStatus>('all');
 
   const filteredOrders = filterStatus === 'all' 
     ? orders 
     : orders.filter(o => o.status === filterStatus);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Cargando pedidos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center text-red-600">
+          <p className="text-xl font-semibold mb-2">Error al cargar pedidos</p>
+          <p className="text-sm">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -130,11 +133,11 @@ export default function OrdersListPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-slate-600">
                         <Calendar className="w-4 h-4" />
-                        <span>{order.createdAt.toLocaleDateString('es-ES')}</span>
+                        <span>{new Date(order.createdAt).toLocaleDateString('es-ES')}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-slate-900">{order.items} items</span>
+                      <span className="text-slate-900">{order.items.length} items</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1 font-semibold text-slate-900">

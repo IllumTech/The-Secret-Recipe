@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { Sparkles } from 'lucide-react';
 import { Product } from '@/lib/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import * as api from '@/lib/api';
 
 interface ProductFormProps {
   product?: Product;
@@ -22,6 +24,7 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -47,6 +50,32 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
     e.preventDefault();
     if (validate()) {
       onSubmit(formData);
+    }
+  };
+
+  const handleGenerateWithAI = async () => {
+    if (!formData.name.trim()) {
+      setErrors({ name: 'Ingresa un nombre primero' });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { description, imageUrl } = await api.generateProductContent(
+        formData.name,
+        formData.category
+      );
+      
+      setFormData(prev => ({
+        ...prev,
+        description,
+        image: imageUrl,
+      }));
+    } catch (error) {
+      console.error('Error generating content:', error);
+      alert('Error al generar contenido con IA. Por favor intenta de nuevo.');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -132,10 +161,28 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
         </div>
       </div>
 
+      {/* AI Generation Button */}
+      {!product && (
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+          <button
+            type="button"
+            onClick={handleGenerateWithAI}
+            disabled={isLoading || isGenerating || !formData.name.trim()}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          >
+            <Sparkles className="w-5 h-5" />
+            {isGenerating ? 'Generando con IA...' : 'Generar Descripción e Imagen con IA'}
+          </button>
+          <p className="text-xs text-slate-600 mt-2 text-center">
+            Usa IA para generar automáticamente una descripción atractiva y una imagen del producto
+          </p>
+        </div>
+      )}
+
       {/* Row 3: Description */}
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1.5">
-          Descripción
+          Descripción {isGenerating && <span className="text-purple-600 animate-pulse">(Generando...)</span>}
         </label>
         <textarea
           id="description"
@@ -143,7 +190,7 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
           value={formData.description}
           onChange={handleChange}
           placeholder="Describe el producto..."
-          disabled={isLoading}
+          disabled={isLoading || isGenerating}
           rows={3}
           className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed resize-none text-sm"
         />
