@@ -4,6 +4,7 @@ export interface Product {
   category: 'helado' | 'postre';
   price: number;
   description?: string;
+  image?: string;
   imageUrl?: string;
   isActive: boolean;
   createdAt: string;
