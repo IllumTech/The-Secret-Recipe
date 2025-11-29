@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Plus, Edit, Trash2, Filter } from 'lucide-react';
 import { useProducts } from '@/contexts/ProductContext';
 import { Product } from '@/lib/types';
@@ -10,9 +11,20 @@ import ProductForm from '@/components/products/ProductForm';
 
 export default function ProductsListPage() {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Abrir modal si viene el parámetro ?nuevo=true
+  useEffect(() => {
+    if (searchParams.get('nuevo') === 'true') {
+      setIsModalOpen(true);
+      // Limpiar el parámetro de la URL
+      router.replace('/admin/productos');
+    }
+  }, [searchParams, router]);
 
   const activeProducts = products.filter(p => p.isActive);
   const filteredProducts = filterCategory === 'all' 
