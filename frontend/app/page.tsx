@@ -69,7 +69,14 @@ export default function HomePage() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
               <button 
-                onClick={() => document.getElementById('productos')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => {
+                  const element = document.getElementById('productos');
+                  if (element) {
+                    const offset = 30; // Offset para el header
+                    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                    window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+                  }
+                }}
                 className="bg-white text-primary-600 hover:bg-gray-50 font-bold py-4 px-8 rounded-full shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-200 text-lg"
               >
                 Ver Productos 🎉
@@ -193,7 +200,7 @@ export default function HomePage() {
       </Modal>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-accent-500 to-primary-600 text-white py-20 my-16">
+      <section className="bg-gradient-to-r from-accent-500 to-primary-600 text-white py-20 mt-16 mb-0">
         <div className="container-custom text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 font-display">
             ¿Listo para endulzar tu día?
@@ -201,7 +208,17 @@ export default function HomePage() {
           <p className="text-xl mb-8 opacity-95 max-w-2xl mx-auto">
             Únete a miles de clientes satisfechos que ya disfrutan de nuestros productos
           </p>
-          <button className="bg-white text-primary-600 hover:bg-gray-50 font-bold py-4 px-10 rounded-full shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-200 text-lg">
+          <button 
+            onClick={() => {
+              const element = document.getElementById('productos');
+              if (element) {
+                const offset = 30;
+                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+              }
+            }}
+            className="bg-white text-primary-600 hover:bg-gray-50 font-bold py-4 px-10 rounded-full shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-200 text-lg"
+          >
             Hacer mi Pedido Ahora 🎉
           </button>
         </div>
