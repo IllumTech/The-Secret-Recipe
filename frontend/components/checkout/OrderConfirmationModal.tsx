@@ -63,9 +63,14 @@ export default function OrderConfirmationModal({
         {/* Order Number */}
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-5 mb-6">
           <p className="text-sm text-gray-600 mb-1 text-center">Número de Pedido</p>
-          <p className="text-2xl font-bold text-purple-600 text-center tracking-wide">
+          <Link
+            href={`/pedido/${orderNumber}`}
+            className="block text-2xl font-bold text-purple-600 text-center tracking-wide hover:text-purple-700 transition-colors underline decoration-2 underline-offset-4"
+            onClick={onClose}
+          >
             {orderNumber}
-          </p>
+          </Link>
+          <p className="text-xs text-gray-500 mt-2 text-center">Haz clic para ver detalles</p>
         </div>
 
         {/* Status Badge */}
