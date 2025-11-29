@@ -3,14 +3,18 @@
 import { Package, ShoppingCart, TrendingUp, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 import { useProducts } from '@/contexts/ProductContext';
+import useSWR from 'swr';
+import { Order } from '@/lib/types';
+import * as api from '@/lib/api';
 
 export default function AdminDashboard() {
   const { products } = useProducts();
+  const { data: orders = [] } = useSWR<Order[]>('orders', api.getOrders);
   
   const totalProducts = products.length;
   const activeProducts = products.filter(p => p.isActive).length;
-  const totalOrders = 0; // Por ahora
-  const totalRevenue = 0; // Por ahora
+  const totalOrders = orders.length;
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
 
   return (
     <div className="space-y-8">
@@ -57,7 +61,7 @@ export default function AdminDashboard() {
         <h2 className="text-2xl font-bold text-slate-900 mb-6">Acciones Rápidas</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <QuickActionButton
-            href="/admin/productos/nuevo"
+            href="/admin/productos?nuevo=true"
             icon={<Package className="w-6 h-6" />}
             title="Crear Producto"
             description="Agregar nuevo producto al catálogo"

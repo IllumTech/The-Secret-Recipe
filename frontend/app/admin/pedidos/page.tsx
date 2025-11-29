@@ -5,6 +5,7 @@ import { Package, User, Calendar, DollarSign, Filter } from 'lucide-react';
 import useSWR from 'swr';
 import { Order } from '@/lib/types';
 import * as api from '@/lib/api';
+import Link from 'next/link';
 
 type OrderStatus = 'all' | 'pending' | 'completed' | 'cancelled';
 
@@ -116,10 +117,13 @@ export default function OrdersListPage() {
                 return (
                   <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Package className="w-4 h-4 text-slate-400" />
-                        <span className="font-medium text-slate-900">{order.orderNumber}</span>
-                      </div>
+                      <Link
+                        href={`/admin/pedidos/${order.id}`}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
+                      >
+                        <Package className="w-4 h-4" />
+                        {order.orderNumber}
+                      </Link>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
