@@ -15,7 +15,7 @@ export default function AdminLayout({
             <Link href="/admin" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
               <ShoppingBag className="w-8 h-8 text-blue-400" />
               <div>
-                <h1 className="text-2xl font-bold">The Secret Recipe</h1>
+                <h1 className="text-2xl font-bold">La Receta Secreta</h1>
                 <p className="text-sm text-slate-400">Panel de Administración</p>
               </div>
             </Link>

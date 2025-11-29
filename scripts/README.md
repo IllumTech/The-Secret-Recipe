@@ -1,6 +1,6 @@
 # Scripts de Utilidad
 
-Scripts para facilitar tareas comunes en The Secret Recipe.
+Scripts para facilitar tareas comunes en La Receta Secreta.
 
 ## Seed de Productos
 

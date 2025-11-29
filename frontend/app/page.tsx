@@ -15,6 +15,18 @@ export default function HomePage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Escuchar eventos de cambio de categoría desde el Header
+  useEffect(() => {
+    const handleCategoryChange = (event: CustomEvent) => {
+      setSelectedCategory(event.detail);
+    };
+
+    window.addEventListener('categoryChange', handleCategoryChange as EventListener);
+    return () => {
+      window.removeEventListener('categoryChange', handleCategoryChange as EventListener);
+    };
+  }, []);
+
   const activeProducts = products.filter(p => p.isActive);
   const filteredProducts = selectedCategory === 'all'
     ? activeProducts
@@ -56,7 +68,7 @@ export default function HomePage() {
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 font-display animate-slide-up">
               Bienvenido a<br />
-              <span className="text-secondary-300">The Secret Recipe</span>
+              <span className="text-secondary-300">La Receta Secreta</span>
             </h1>
             
             <p className="text-xl md:text-3xl mb-4 font-medium animate-slide-up opacity-95">
@@ -72,7 +84,7 @@ export default function HomePage() {
                 onClick={() => {
                   const element = document.getElementById('productos');
                   if (element) {
-                    const offset = 30; // Offset para el header
+                    const offset = 100; // Offset para el header
                     const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
                     window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
                   }
@@ -117,7 +129,7 @@ export default function HomePage() {
       </section>
 
       {/* Products Section */}
-      <section id="productos" className="container-custom py-16">
+      <section id="productos" className="container-custom py-16 scroll-mt-24">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 font-display">
             Nuestros <span className="gradient-text">Productos</span>
@@ -212,7 +224,7 @@ export default function HomePage() {
             onClick={() => {
               const element = document.getElementById('productos');
               if (element) {
-                const offset = 30;
+                const offset = 100;
                 const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
                 window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
               }

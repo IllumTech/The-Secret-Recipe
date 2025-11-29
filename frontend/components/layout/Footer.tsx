@@ -6,7 +6,7 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <span className="text-4xl">🍦</span>
-              <h3 className="text-2xl font-bold font-display">The Secret Recipe</h3>
+              <h3 className="text-2xl font-bold font-display">La Receta Secreta</h3>
             </div>
             <p className="text-gray-300 mb-4 max-w-md">
               Creando momentos dulces e inolvidables con los mejores helados y postres artesanales. 
@@ -70,7 +70,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-700 mt-10 pt-8 text-center">
           <p className="text-gray-400">
-            &copy; 2025 The Secret Recipe. Todos los derechos reservados. 
+            &copy; 2025 La Receta Secreta. Todos los derechos reservados. 
             <span className="mx-2">|</span>
             Hecho con <span className="text-primary-500">❤️</span> y mucho azúcar
           </p>

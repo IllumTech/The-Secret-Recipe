@@ -68,17 +68,19 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
       >
         <div className="flex flex-col h-full">
           {/* Header - Fixed */}
-          <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-white/90 backdrop-blur-sm border-b border-purple-200 shadow-sm">
-            <h2 className="text-xl sm:text-2xl font-bold gradient-text">Tu Carrito</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 transition-all flex-shrink-0"
-              aria-label="Cerrar carrito"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+          <div className="flex-shrink-0 bg-white/80 backdrop-blur-md shadow-sm border-b border-pink-100">
+            <div className="flex items-center justify-between px-6 py-4">
+              <h2 className="text-xl sm:text-2xl font-bold gradient-text">Tu Carrito</h2>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 transition-all flex-shrink-0"
+                aria-label="Cerrar carrito"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Cart Items - Scrollable */}

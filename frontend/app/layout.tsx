@@ -8,7 +8,7 @@ import ConditionalLayout from '@/components/layout/ConditionalLayout';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'The Secret Recipe - Helados y Postres Artesanales',
+  title: 'La Receta Secreta - Helados y Postres Artesanales',
   description: 'Los mejores helados y postres artesanales',
 };
 

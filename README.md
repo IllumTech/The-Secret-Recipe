@@ -1,4 +1,4 @@
-# 🍦 The Secret Recipe
+# 🍦 La Receta Secreta
 
 Una plataforma e-commerce moderna para venta de helados y postres, potenciada por Inteligencia Artificial generativa.
 

@@ -1,6 +1,6 @@
-# The Secret Recipe - Backend
+# La Receta Secreta - Backend
 
-Backend serverless para The Secret Recipe usando AWS SAM (Serverless Application Model).
+Backend serverless para La Receta Secreta usando AWS SAM (Serverless Application Model).
 
 ## Arquitectura
 
