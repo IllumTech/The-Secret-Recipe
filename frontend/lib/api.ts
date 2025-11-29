@@ -54,6 +54,15 @@ export async function getOrders(): Promise<Order[]> {
   return apiCall<Order[]>('/orders');
 }
 
+export async function getOrderByNumber(orderNumber: string): Promise<Order> {
+  const orders = await getOrders();
+  const order = orders.find(o => o.orderNumber === orderNumber);
+  if (!order) {
+    throw new Error('Order not found');
+  }
+  return order;
+}
+
 export async function createOrder(data: {
   customerName: string;
   customerEmail: string;
