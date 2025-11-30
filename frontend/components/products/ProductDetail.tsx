@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Product } from '@/lib/types';
 import Button from '@/components/ui/Button';
 import { useCart } from '@/hooks/useCart';
+import { getDisplayPrice, getDiscountPercentage, getSavingsAmount } from '@/lib/pricing';
 
 interface ProductDetailProps {
   product: Product;
@@ -45,6 +46,16 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             <span>{product.category}</span>
           </span>
         </div>
+
+        {/* Promotion Badge */}
+        {product.isOnPromotion && (
+          <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full shadow-xl animate-pulse">
+            <span className="text-sm font-bold flex items-center gap-2">
+              <span className="text-xl">🔥</span>
+              <span>¡OFERTA ESPECIAL!</span>
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Información del producto */}
@@ -54,12 +65,36 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             {product.name}
           </h1>
           
-          <div className="flex items-baseline mb-4">
-            <span className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              ${product.price.toFixed(2)}
-            </span>
-            <span className="text-gray-500 text-sm ml-2">por unidad</span>
-          </div>
+          {product.isOnPromotion && product.promotionalPrice ? (
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl text-gray-500 line-through">
+                  ${product.price.toFixed(2)}
+                </span>
+                <span className="bg-red-100 text-red-600 text-sm font-bold px-3 py-1 rounded-full">
+                  -{getDiscountPercentage(product)}% OFF
+                </span>
+              </div>
+              <div className="flex items-baseline">
+                <span className="text-5xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                  ${product.promotionalPrice.toFixed(2)}
+                </span>
+                <span className="text-gray-500 text-sm ml-2">por unidad</span>
+              </div>
+              <div className="mt-2 inline-block bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
+                <span className="text-green-700 font-semibold text-sm">
+                  ¡Ahorras ${getSavingsAmount(product).toFixed(2)}!
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-baseline mb-4">
+              <span className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+                ${product.price.toFixed(2)}
+              </span>
+              <span className="text-gray-500 text-sm ml-2">por unidad</span>
+            </div>
+          )}
 
           {product.description && (
             <div className="mb-4 p-4 bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl">
