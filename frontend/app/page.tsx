@@ -28,7 +28,9 @@ export default function HomePage() {
   }, []);
 
   const activeProducts = products.filter(p => p.isActive);
-  const filteredProducts = selectedCategory === 'all'
+  const filteredProducts = selectedCategory === 'promocion'
+    ? activeProducts.filter(p => p.isOnPromotion)
+    : selectedCategory === 'all'
     ? activeProducts
     : activeProducts.filter(p => p.category === selectedCategory);
 
@@ -155,6 +157,19 @@ export default function HomePage() {
             </span>
           </button>
           <button
+            onClick={() => setSelectedCategory('promocion')}
+            className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:-translate-y-1 ${
+              selectedCategory === 'promocion'
+                ? 'bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg animate-pulse'
+                : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
+            }`}
+          >
+            <span className="flex items-center space-x-2">
+              <span>🔥</span>
+              <span>Promociones</span>
+            </span>
+          </button>
+          <button
             onClick={() => setSelectedCategory('helado')}
             className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:-translate-y-1 ${
               selectedCategory === 'helado'
@@ -190,13 +205,25 @@ export default function HomePage() {
               : 'opacity-100 transform scale-100 blur-0'
           }`}
         >
-          <ProductGrid 
-            products={displayedProducts}
-            onProductClick={(product) => {
-              setSelectedProduct(product);
-              setIsModalOpen(true);
-            }}
-          />
+          {selectedCategory === 'promocion' && displayedProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-8xl mb-6 animate-bounce">🔥</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                No hay productos en promoción en este momento
+              </h3>
+              <p className="text-gray-600 text-lg">
+                ¡Vuelve pronto para ver nuestras ofertas especiales!
+              </p>
+            </div>
+          ) : (
+            <ProductGrid 
+              products={displayedProducts}
+              onProductClick={(product) => {
+                setSelectedProduct(product);
+                setIsModalOpen(true);
+              }}
+            />
+          )}
         </div>
       </section>
 
