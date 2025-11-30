@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Product } from '@/lib/types';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
+import { getDisplayPrice, getDiscountPercentage } from '@/lib/pricing';
 
 interface ProductCardProps {
   product: Product;
@@ -64,6 +65,16 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
             {categoryEmoji} {product.category}
           </span>
         </div>
+
+        {/* Promotion Badge */}
+        {product.isOnPromotion && (
+          <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full shadow-lg animate-pulse">
+            <span className="text-xs font-bold flex items-center gap-1">
+              <span>🔥</span>
+              <span>¡OFERTA!</span>
+            </span>
+          </div>
+        )}
 
         {/* Controles de cantidad - Esquina superior derecha */}
         <div 
@@ -132,9 +143,25 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
         )}
         
         <div className="mt-4">
-          <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-            ${product.price.toFixed(2)}
-          </span>
+          {product.isOnPromotion && product.promotionalPrice ? (
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-lg text-gray-500 line-through">
+                  ${product.price.toFixed(2)}
+                </span>
+                <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                  -{getDiscountPercentage(product)}%
+                </span>
+              </div>
+              <span className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                ${product.promotionalPrice.toFixed(2)}
+              </span>
+            </div>
+          ) : (
+            <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+              ${product.price.toFixed(2)}
+            </span>
+          )}
         </div>
       </div>
     </div>
