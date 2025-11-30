@@ -7,6 +7,8 @@ export interface Product {
   image?: string;
   imageUrl?: string;
   isActive: boolean;
+  isOnPromotion: boolean;
+  promotionalPrice?: number;
   createdAt: string;
   updatedAt: string;
 }
