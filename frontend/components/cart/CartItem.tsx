@@ -2,6 +2,7 @@
 
 import { CartItem as CartItemType } from '@/lib/types';
 import { useCart } from '@/hooks/useCart';
+import { getDisplayPrice } from '@/lib/pricing';
 
 interface CartItemProps {
   item: CartItemType;
@@ -10,7 +11,8 @@ interface CartItemProps {
 export default function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeItem } = useCart();
   const { product, quantity } = item;
-  const subtotal = product.price * quantity;
+  const displayPrice = getDisplayPrice(product);
+  const subtotal = displayPrice * quantity;
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
 
   return (
@@ -22,9 +24,20 @@ export default function CartItem({ item }: CartItemProps) {
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
         <p className="text-sm text-gray-500">{product.category}</p>
-        <p className="text-lg font-bold text-purple-600 mt-1">
-          ${product.price.toFixed(2)}
-        </p>
+        {product.isOnPromotion && product.promotionalPrice ? (
+          <div className="mt-1">
+            <p className="text-sm text-gray-400 line-through">
+              ${product.price.toFixed(2)}
+            </p>
+            <p className="text-lg font-bold text-red-600">
+              ${product.promotionalPrice.toFixed(2)}
+            </p>
+          </div>
+        ) : (
+          <p className="text-lg font-bold text-purple-600 mt-1">
+            ${product.price.toFixed(2)}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col items-end justify-between">
