@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo The Secret Recipe - Backend Setup
+echo La Receta Secreta - Backend Setup
 echo ========================================
 echo.
 

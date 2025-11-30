@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: The Secret Recipe - E-commerce Backend
+Description: La Receta Secreta - E-commerce Backend
 
 Globals:
   Function:

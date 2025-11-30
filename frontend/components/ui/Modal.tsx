@@ -45,12 +45,12 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
       />
       
       {/* Modal */}
-      <div className={`relative bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col transition-all duration-300 ${
+      <div className={`relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col transition-all duration-300 ${
         isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
       }`}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 rounded-t-2xl bg-gradient-to-r from-slate-50 to-white">
-          <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 rounded-t-2xl bg-gradient-to-r from-slate-50 to-white">
+          <h2 className="text-lg font-bold text-slate-900">{title}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
@@ -61,7 +61,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
         </div>
         
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-6">
           {children}
         </div>
       </div>
