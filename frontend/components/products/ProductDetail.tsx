@@ -53,64 +53,82 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         document.body
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
-      {/* Imagen del producto */}
-      <div className="relative h-[320px] bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl overflow-hidden shadow-lg group">
-        {product.imageUrl ? (
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-8xl">
-            {categoryEmoji}
-          </div>
-        )}
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md">
-          <span className="text-sm font-semibold text-primary-600 capitalize flex items-center gap-1.5">
-            <span>{categoryEmoji}</span>
-            <span>{product.category}</span>
-          </span>
-        </div>
-
-        {/* Promotion Badge */}
-        {product.isOnPromotion && (
-          <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full shadow-xl animate-pulse">
-            <span className="text-sm font-bold flex items-center gap-2">
-              <span className="text-xl">🔥</span>
-              <span>¡OFERTA ESPECIAL!</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in">
+      {/* Imagen del producto y badges */}
+      <div className="space-y-3">
+        <div className="relative h-[280px] bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl overflow-hidden shadow-lg group">
+          {product.imageUrl ? (
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-8xl">
+              {categoryEmoji}
+            </div>
+          )}
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md">
+            <span className="text-sm font-semibold text-primary-600 capitalize flex items-center gap-1.5">
+              <span>{categoryEmoji}</span>
+              <span>{product.category}</span>
             </span>
           </div>
-        )}
+
+          {/* Promotion Badge */}
+          {product.isOnPromotion && (
+            <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full shadow-xl animate-pulse">
+              <span className="text-sm font-bold flex items-center gap-2">
+                <span className="text-xl">🔥</span>
+                <span>¡OFERTA ESPECIAL!</span>
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Badges de características - Movidos aquí */}
+        <div className="flex gap-2 justify-center">
+          <div className="px-3 py-1.5 bg-green-50 rounded-lg flex items-center gap-1.5">
+            <span className="text-sm">✅</span>
+            <span className="text-xs font-semibold text-green-700">Natural</span>
+          </div>
+          <div className="px-3 py-1.5 bg-blue-50 rounded-lg flex items-center gap-1.5">
+            <span className="text-sm">❄️</span>
+            <span className="text-xs font-semibold text-blue-700">Fresco</span>
+          </div>
+          <div className="px-3 py-1.5 bg-purple-50 rounded-lg flex items-center gap-1.5">
+            <span className="text-sm">⭐</span>
+            <span className="text-xs font-semibold text-purple-700">Premium</span>
+          </div>
+        </div>
       </div>
 
       {/* Información del producto */}
       <div className="flex flex-col justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 font-display">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 font-display">
             {product.name}
           </h1>
           
           {product.isOnPromotion && product.promotionalPrice ? (
-            <div className="mb-4">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl text-gray-500 line-through">
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg text-gray-500 line-through">
                   ${product.price.toFixed(2)}
                 </span>
-                <span className="bg-red-100 text-red-600 text-sm font-bold px-3 py-1 rounded-full">
+                <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
                   -{getDiscountPercentage(product)}% OFF
                 </span>
               </div>
-              <div className="flex items-baseline">
-                <span className="text-5xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+              <div className="flex items-center gap-2">
+                <span className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
                   ${product.promotionalPrice.toFixed(2)}
                 </span>
-                <span className="text-gray-500 text-sm ml-2">por unidad</span>
+                <span className="text-gray-500 text-xs">por unidad</span>
               </div>
-              <div className="mt-2 inline-block bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
-                <span className="text-green-700 font-semibold text-sm">
+              <div className="mt-1 inline-block bg-green-50 border border-green-200 rounded-lg px-2 py-1">
+                <span className="text-green-700 font-semibold text-xs">
                   ¡Ahorras ${getSavingsAmount(product).toFixed(2)}!
                 </span>
               </div>
@@ -125,45 +143,29 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           )}
 
           {product.description && (
-            <div className="mb-4 p-4 bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl">
-              <p className="text-gray-700 text-sm leading-relaxed">{product.description}</p>
+            <div className="mb-2 p-3 bg-gradient-to-br from-pink-50 to-purple-50 rounded-lg">
+              <p className="text-gray-700 text-xs leading-relaxed">{product.description}</p>
             </div>
           )}
-
-          {/* Badges de características */}
-          <div className="flex gap-2 mb-4">
-            <div className="px-3 py-1.5 bg-green-50 rounded-lg flex items-center gap-1.5">
-              <span className="text-sm">✅</span>
-              <span className="text-xs font-semibold text-green-700">Natural</span>
-            </div>
-            <div className="px-3 py-1.5 bg-blue-50 rounded-lg flex items-center gap-1.5">
-              <span className="text-sm">❄️</span>
-              <span className="text-xs font-semibold text-blue-700">Fresco</span>
-            </div>
-            <div className="px-3 py-1.5 bg-purple-50 rounded-lg flex items-center gap-1.5">
-              <span className="text-sm">⭐</span>
-              <span className="text-xs font-semibold text-purple-700">Premium</span>
-            </div>
-          </div>
         </div>
 
         {/* Controles de cantidad y botón */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-            <span className="text-sm font-semibold text-gray-700">Cantidad</span>
-            <div className="flex items-center gap-3">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <span className="text-xs font-semibold text-gray-700">Cantidad</span>
+            <div className="flex items-center gap-2">
               <button
                 onClick={decrementQuantity}
-                className="w-10 h-10 bg-white hover:bg-gray-100 rounded-lg font-bold text-xl text-gray-700 shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center"
+                className="w-8 h-8 bg-white hover:bg-gray-100 rounded-lg font-bold text-lg text-gray-700 shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center"
               >
                 −
               </button>
-              <span className="text-2xl font-bold w-12 text-center text-primary-600">
+              <span className="text-xl font-bold w-10 text-center text-primary-600">
                 {quantity}
               </span>
               <button
                 onClick={incrementQuantity}
-                className="w-10 h-10 bg-primary-500 hover:bg-primary-600 rounded-lg font-bold text-xl text-white shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center"
+                className="w-8 h-8 bg-primary-500 hover:bg-primary-600 rounded-lg font-bold text-lg text-white shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center"
               >
                 +
               </button>
@@ -172,10 +174,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           <Button
             onClick={handleAddToCart}
-            className="w-full py-3.5 text-lg flex items-center justify-center gap-2"
+            className="w-full py-3 text-base flex items-center justify-center gap-2"
           >
             <span>Agregar al Carrito</span>
-            <span className="text-xl">🛒</span>
+            <span className="text-lg">🛒</span>
           </Button>
         </div>
       </div>
