@@ -255,6 +255,7 @@ export default function HomePage() {
           </p>
           <button 
             onClick={() => {
+              setSelectedCategory('all');
               const element = document.getElementById('productos');
               if (element) {
                 const offset = 100;
