@@ -27,7 +27,9 @@ export default function ProductsListPage() {
   }, [searchParams, router]);
 
   const activeProducts = products.filter(p => p.isActive);
-  const filteredProducts = filterCategory === 'all' 
+  const filteredProducts = filterCategory === 'promocion'
+    ? activeProducts.filter(p => p.isOnPromotion)
+    : filterCategory === 'all' 
     ? activeProducts 
     : activeProducts.filter(p => p.category === filterCategory);
 
@@ -88,6 +90,12 @@ export default function ProductsListPage() {
               Todos ({activeProducts.length})
             </FilterButton>
             <FilterButton
+              active={filterCategory === 'promocion'}
+              onClick={() => setFilterCategory('promocion')}
+            >
+              🔥 Promociones ({activeProducts.filter(p => p.isOnPromotion).length})
+            </FilterButton>
+            <FilterButton
               active={filterCategory === 'helado'}
               onClick={() => setFilterCategory('helado')}
             >
@@ -121,8 +129,15 @@ export default function ProductsListPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{product.image || '📦'}</div>
-                      <div>
-                        <div className="font-medium text-slate-900">{product.name}</div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium text-slate-900">{product.name}</div>
+                          {product.isOnPromotion && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse">
+                              🔥 OFERTA
+                            </span>
+                          )}
+                        </div>
                         <div className="text-sm text-slate-500 line-clamp-1">
                           {product.description || 'Sin descripción'}
                         </div>
@@ -139,7 +154,18 @@ export default function ProductsListPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="font-semibold text-slate-900">${product.price.toFixed(2)}</span>
+                    {product.isOnPromotion && product.promotionalPrice ? (
+                      <div>
+                        <div className="text-sm text-slate-400 line-through">
+                          ${product.price.toFixed(2)}
+                        </div>
+                        <div className="font-semibold text-red-600">
+                          ${product.promotionalPrice.toFixed(2)}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="font-semibold text-slate-900">${product.price.toFixed(2)}</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">

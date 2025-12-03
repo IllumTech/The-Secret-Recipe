@@ -126,7 +126,23 @@ async function createProduct(data: any): Promise<APIGatewayProxyResult> {
       return errorResponse(400, 'Missing required fields: name, category, price');
     }
 
-    const product = {
+    // Promotion validation
+    if (data.isOnPromotion) {
+      if (!data.promotionalPrice) {
+        return errorResponse(400, 'El precio promocional es requerido cuando la promoción está activa');
+      }
+      const price = parseFloat(data.price);
+      const promotionalPrice = parseFloat(data.promotionalPrice);
+      
+      if (promotionalPrice < 0) {
+        return errorResponse(400, 'El precio promocional debe ser mayor a 0');
+      }
+      if (promotionalPrice >= price) {
+        return errorResponse(400, 'El precio promocional debe ser menor al precio original');
+      }
+    }
+
+    const product: any = {
       id: uuidv4(),
       name: data.name,
       category: data.category,
@@ -134,9 +150,15 @@ async function createProduct(data: any): Promise<APIGatewayProxyResult> {
       description: data.description || '',
       image: data.image || '🍦',
       isActive: true,
+      isOnPromotion: data.isOnPromotion || false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+
+    // Only add promotionalPrice if promotion is enabled
+    if (data.isOnPromotion && data.promotionalPrice) {
+      product.promotionalPrice = parseFloat(data.promotionalPrice);
+    }
 
     const command = new PutCommand({
       TableName: PRODUCTS_TABLE,
@@ -167,6 +189,24 @@ async function updateProduct(id: string, data: any): Promise<APIGatewayProxyResu
       return errorResponse(404, 'Product not found');
     }
 
+    // Promotion validation
+    if (data.isOnPromotion !== undefined) {
+      if (data.isOnPromotion) {
+        if (!data.promotionalPrice) {
+          return errorResponse(400, 'El precio promocional es requerido cuando la promoción está activa');
+        }
+        const price = data.price !== undefined ? parseFloat(data.price) : existing.Item.price;
+        const promotionalPrice = parseFloat(data.promotionalPrice);
+        
+        if (promotionalPrice < 0) {
+          return errorResponse(400, 'El precio promocional debe ser mayor a 0');
+        }
+        if (promotionalPrice >= price) {
+          return errorResponse(400, 'El precio promocional debe ser menor al precio original');
+        }
+      }
+    }
+
     // Build update expression
     const updates: any = {
       updatedAt: new Date().toISOString()
@@ -177,6 +217,15 @@ async function updateProduct(id: string, data: any): Promise<APIGatewayProxyResu
     if (data.price !== undefined) updates.price = parseFloat(data.price);
     if (data.description !== undefined) updates.description = data.description;
     if (data.image !== undefined) updates.image = data.image;
+    if (data.isOnPromotion !== undefined) {
+      updates.isOnPromotion = data.isOnPromotion;
+      if (data.isOnPromotion && data.promotionalPrice !== undefined) {
+        updates.promotionalPrice = parseFloat(data.promotionalPrice);
+      } else if (!data.isOnPromotion) {
+        // When disabling promotion, remove promotional price
+        updates.promotionalPrice = null;
+      }
+    }
 
     const updateExpression = 'SET ' + Object.keys(updates).map((key, index) => `#${key} = :${key}`).join(', ');
     const expressionAttributeNames = Object.keys(updates).reduce((acc, key) => {

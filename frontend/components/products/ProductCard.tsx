@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Product } from '@/lib/types';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
+import { getDisplayPrice, getDiscountPercentage } from '@/lib/pricing';
 
 interface ProductCardProps {
   product: Product;
@@ -65,9 +66,16 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
           </span>
         </div>
 
+        {/* Promotion Badge - Compacto en la parte superior */}
+        {product.isOnPromotion && (
+          <div className="absolute top-3 right-16 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-md shadow-lg z-10">
+            <span className="text-xs font-bold">🔥 OFERTA</span>
+          </div>
+        )}
+
         {/* Controles de cantidad - Esquina superior derecha */}
         <div 
-          className="absolute top-3 right-3 z-10"
+          className="absolute top-3 right-3 z-20"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -131,10 +139,26 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
           </p>
         )}
         
-        <div className="mt-4">
-          <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-            ${product.price.toFixed(2)}
-          </span>
+        <div className="mt-4 h-20 flex flex-col justify-end">
+          {product.isOnPromotion && product.promotionalPrice ? (
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-lg text-gray-500 line-through">
+                  ${product.price.toFixed(2)}
+                </span>
+                <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                  -{getDiscountPercentage(product)}%
+                </span>
+              </div>
+              <span className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                ${product.promotionalPrice.toFixed(2)}
+              </span>
+            </div>
+          ) : (
+            <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+              ${product.price.toFixed(2)}
+            </span>
+          )}
         </div>
       </div>
     </div>
