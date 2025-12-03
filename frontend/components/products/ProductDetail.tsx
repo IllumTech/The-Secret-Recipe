@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
 import Button from '@/components/ui/Button';
@@ -13,19 +14,46 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1);
+  const [showToast, setShowToast] = useState(false);
+  const [toastQuantity, setToastQuantity] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const { addItem } = useCart();
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleAddToCart = () => {
     addItem(product, quantity);
-    alert(`${quantity} ${product.name} agregado(s) al carrito!`);
+    setToastQuantity(quantity);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   const incrementQuantity = () => setQuantity(q => q + 1);
   const decrementQuantity = () => setQuantity(q => Math.max(1, q - 1));
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
+    <>
+      {/* Toast Notification - Portal to body */}
+      {mounted && showToast && createPortal(
+        <div 
+          className="fixed top-4 right-4 z-[9999] animate-fade-in-down cursor-pointer"
+          onClick={() => setShowToast(false)}
+        >
+          <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3">
+            <span className="text-xl">✅</span>
+            <div>
+              <p className="font-semibold text-sm">¡Agregado al carrito!</p>
+              <p className="text-xs opacity-90">{toastQuantity} {product.name}</p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
       {/* Imagen del producto */}
       <div className="relative h-[320px] bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl overflow-hidden shadow-lg group">
         {product.imageUrl ? (
@@ -151,6 +179,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           </Button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
