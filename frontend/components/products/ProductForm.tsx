@@ -63,7 +63,13 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit(formData);
+      // Prepare data for submission
+      const submitData = {
+        ...formData,
+        // Only include promotionalPrice if promotion is enabled
+        promotionalPrice: formData.isOnPromotion ? formData.promotionalPrice : undefined,
+      };
+      onSubmit(submitData);
     }
   };
 
