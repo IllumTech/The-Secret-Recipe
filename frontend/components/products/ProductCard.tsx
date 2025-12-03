@@ -66,12 +66,7 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
           </span>
         </div>
 
-        {/* Promotion Badge - Compacto en la parte superior */}
-        {product.isOnPromotion && (
-          <div className="absolute top-3 right-16 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-md shadow-lg z-10">
-            <span className="text-xs font-bold">🔥 OFERTA</span>
-          </div>
-        )}
+
 
         {/* Controles de cantidad - Esquina superior derecha */}
         <div 
@@ -139,19 +134,24 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
           </p>
         )}
         
-        <div className="mt-4 h-20 flex flex-col justify-end">
+        <div className="h-20 flex flex-col justify-end">
           {product.isOnPromotion && product.promotionalPrice ? (
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-lg text-gray-500 line-through">
-                  ${product.price.toFixed(2)}
-                </span>
-                <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                  -{getDiscountPercentage(product)}%
+            <div className="flex items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg text-gray-500 line-through">
+                    ${product.price.toFixed(2)}
+                  </span>
+                  <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                    -{getDiscountPercentage(product)}%
+                  </span>
+                </div>
+                <span className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                  ${product.promotionalPrice.toFixed(2)}
                 </span>
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                ${product.promotionalPrice.toFixed(2)}
+              <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2 py-1 rounded-md shadow-md whitespace-nowrap self-center">
+                🔥 OFERTA
               </span>
             </div>
           ) : (
