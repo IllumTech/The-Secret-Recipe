@@ -142,7 +142,7 @@ async function createProduct(data: any): Promise<APIGatewayProxyResult> {
       }
     }
 
-    const product = {
+    const product: any = {
       id: uuidv4(),
       name: data.name,
       category: data.category,
@@ -151,10 +151,14 @@ async function createProduct(data: any): Promise<APIGatewayProxyResult> {
       image: data.image || '🍦',
       isActive: true,
       isOnPromotion: data.isOnPromotion || false,
-      promotionalPrice: data.isOnPromotion ? parseFloat(data.promotionalPrice) : undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+
+    // Only add promotionalPrice if promotion is enabled
+    if (data.isOnPromotion && data.promotionalPrice) {
+      product.promotionalPrice = parseFloat(data.promotionalPrice);
+    }
 
     const command = new PutCommand({
       TableName: PRODUCTS_TABLE,
