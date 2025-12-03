@@ -66,19 +66,16 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
           </span>
         </div>
 
-        {/* Promotion Badge */}
+        {/* Promotion Badge - Compacto en la parte superior */}
         {product.isOnPromotion && (
-          <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full shadow-lg animate-pulse">
-            <span className="text-xs font-bold flex items-center gap-1">
-              <span>🔥</span>
-              <span>¡OFERTA!</span>
-            </span>
+          <div className="absolute top-3 right-16 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-md shadow-lg z-10">
+            <span className="text-xs font-bold">🔥 OFERTA</span>
           </div>
         )}
 
         {/* Controles de cantidad - Esquina superior derecha */}
         <div 
-          className="absolute top-3 right-3 z-10"
+          className="absolute top-3 right-3 z-20"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -142,7 +139,7 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
           </p>
         )}
         
-        <div className="mt-4">
+        <div className="mt-4 h-20 flex flex-col justify-end">
           {product.isOnPromotion && product.promotionalPrice ? (
             <div className="space-y-1">
               <div className="flex items-center gap-2">
