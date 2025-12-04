@@ -11,7 +11,7 @@ Backend serverless para La Receta Secreta usando AWS SAM (Serverless Application
   - AI Generator Function: Generación de contenido con IA
 - **DynamoDB**: Base de datos NoSQL para productos y pedidos
 - **S3**: Almacenamiento de imágenes de productos
-- **Bedrock**: Servicios de IA generativa (Claude 3 Sonnet, Stable Diffusion XL)
+- **Bedrock**: Servicios de IA generativa (Claude 3 Sonnet, Amazon Nova Canvas)
 
 ## Prerequisitos
 
@@ -182,7 +182,7 @@ Asegúrate de haber ejecutado `npm install` en cada directorio de función.
 Habilita el acceso a los modelos en la consola de AWS Bedrock:
 1. Ve a AWS Bedrock Console
 2. Model access
-3. Request access para Claude 3 Sonnet y Stable Diffusion XL
+3. Request access para Claude 3 Sonnet y Amazon Nova Canvas
 
 ### Error: "Table does not exist"
 
@@ -200,6 +200,6 @@ aws cloudformation describe-stacks --stack-name the-secret-recipe
 - **S3**: $0.023 por GB/mes
 - **Bedrock**: 
   - Claude 3 Sonnet: ~$0.003 por 1K tokens
-  - Stable Diffusion XL: ~$0.04 por imagen
+  - Amazon Nova Canvas: ~$0.04 por imagen
 
 Costo estimado mensual para desarrollo: **$5-10/mes**
