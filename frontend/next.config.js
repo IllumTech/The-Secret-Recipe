@@ -12,8 +12,7 @@ const nextConfig = {
       },
     ],
   },
-  output: 'standalone',
-  outputFileTracingRoot: require('path').join(__dirname, '../'),
+  // Removed standalone output for Amplify compatibility
 }
 
 module.exports = nextConfig

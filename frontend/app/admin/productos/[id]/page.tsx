@@ -9,25 +9,29 @@ import { Product } from '@/lib/types';
 import { mockProducts } from '@/lib/mock-data';
 import Loading from '@/components/ui/Loading';
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
+  const [productId, setProductId] = useState<string>('');
 
   useEffect(() => {
-    // TODO: Cargar producto desde la API
-    const foundProduct = mockProducts.find(p => p.id === params.id);
-    setProduct(foundProduct || null);
-    setIsLoadingProduct(false);
-  }, [params.id]);
+    params.then(({ id }) => {
+      setProductId(id);
+      // TODO: Cargar producto desde la API
+      const foundProduct = mockProducts.find(p => p.id === id);
+      setProduct(foundProduct || null);
+      setIsLoadingProduct(false);
+    });
+  }, [params]);
 
   const handleSubmit = async (data: Partial<Product>) => {
     setIsLoading(true);
     
     try {
       // TODO: Llamar a la API para actualizar el producto
-      console.log('Updating product:', params.id, data);
+      console.log('Updating product:', productId, data);
       
       // Simular delay de API
       await new Promise(resolve => setTimeout(resolve, 1000));
