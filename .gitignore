@@ -137,3 +137,19 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# AWS SAM
+.aws-sam/
+samconfig.toml
+.amazonq/
+.kiro/
+
+# IDE
+.vscode/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Docs
+docs/

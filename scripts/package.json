@@ -1,0 +1,13 @@
+{
+  "name": "la-receta-secreta-scripts",
+  "version": "1.0.0",
+  "description": "Utility scripts for La Receta Secreta",
+  "scripts": {
+    "seed": "ts-node seed-products.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

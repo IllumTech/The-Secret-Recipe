@@ -1,0 +1,22 @@
+# SAM
+.aws-sam/
+samconfig.toml
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build
+dist/
+*.js
+*.js.map
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# TypeScript
+*.tsbuildinfo

@@ -1,0 +1,238 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: La Receta Secreta - E-commerce Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs20.x
+    MemorySize: 512
+    Environment:
+      Variables:
+        PRODUCTS_TABLE: !Ref ProductsTable
+        ORDERS_TABLE: !Ref OrdersTable
+        IMAGES_BUCKET: !Ref ImagesBucket
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
+
+Resources:
+  # API Gateway
+  TheSecretRecipeApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  # DynamoDB Tables
+  ProductsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TheSecretRecipe-Products
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TheSecretRecipe-Orders
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  # S3 Bucket for Images
+  ImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'the-secret-recipe-images-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+            AllowedOrigins:
+              - '*'
+            MaxAge: 3000
+
+  ImagesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ImagesBucket
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Sub '${ImagesBucket.Arn}/*'
+
+  # Lambda Functions
+  ProductsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/products/
+      Handler: index.handler
+      Events:
+        ListProducts:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /products
+            Method: GET
+        GetProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /products/{id}
+            Method: GET
+        CreateProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /products
+            Method: POST
+        UpdateProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /products/{id}
+            Method: PUT
+        DeleteProduct:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /products/{id}
+            Method: DELETE
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+
+  OrdersFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/orders/
+      Handler: index.handler
+      Events:
+        ListOrders:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /orders
+            Method: GET
+        CreateOrder:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /orders
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+
+  AIGeneratorFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/ai-generator/
+      Handler: index.handler
+      Timeout: 60
+      Events:
+        GenerateContent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /ai/generate
+            Method: POST
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource:
+                - 'arn:aws:bedrock:*::foundation-model/*'
+        - S3CrudPolicy:
+            BucketName: !Ref ImagesBucket
+
+  UploadImageFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/upload-image/
+      Handler: index.handler
+      Timeout: 30
+      Events:
+        UploadImage:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /upload
+            Method: POST
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ImagesBucket
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${TheSecretRecipeApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  ProductsTableName:
+    Description: DynamoDB Products Table Name
+    Value: !Ref ProductsTable
+  OrdersTableName:
+    Description: DynamoDB Orders Table Name
+    Value: !Ref OrdersTable
+  ImagesBucketName:
+    Description: S3 Images Bucket Name
+    Value: !Ref ImagesBucket
