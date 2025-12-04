@@ -97,3 +97,30 @@ export async function generateProductContent(
     body: JSON.stringify({ productName, category }),
   });
 }
+
+// Upload Image API
+export async function uploadImage(file: File): Promise<{ imageUrl: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = async () => {
+      try {
+        const base64 = (reader.result as string).split(',')[1];
+        const result = await apiCall<{ imageUrl: string }>('/upload', {
+          method: 'POST',
+          body: JSON.stringify({
+            image: base64,
+            fileName: file.name,
+            contentType: file.type,
+          }),
+        });
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+}
