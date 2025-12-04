@@ -46,14 +46,14 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = 'Requerido';
-    if (formData.price <= 0) newErrors.price = 'Debe ser mayor a 0';
+    if (Number(formData.price) <= 0) newErrors.price = 'Debe ser mayor a 0';
     if (!formData.category) newErrors.category = 'Requerido';
     
     // Promotion validation
     if (formData.isOnPromotion) {
-      if (!formData.promotionalPrice || formData.promotionalPrice <= 0) {
+      if (!formData.promotionalPrice || Number(formData.promotionalPrice) <= 0) {
         newErrors.promotionalPrice = 'El precio promocional es requerido y debe ser mayor a 0';
-      } else if (formData.promotionalPrice >= formData.price) {
+      } else if (Number(formData.promotionalPrice) >= Number(formData.price)) {
         newErrors.promotionalPrice = 'El precio promocional debe ser menor al precio original';
       }
     }
