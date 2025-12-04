@@ -186,17 +186,17 @@ export default function AdminOrderDetailPage() {
             <div key={index} className="flex items-center justify-between py-4 px-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
               <div className="flex items-center flex-1">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-3xl mr-4">
-                  {item.image || '🍦'}
+                  {item.product.image || '🍦'}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-slate-900">{item.name}</h4>
+                  <h4 className="font-semibold text-slate-900">{item.product.name}</h4>
                   <p className="text-sm text-slate-500">Cantidad: {item.quantity}</p>
-                  <p className="text-sm text-slate-600">${item.price.toFixed(2)} c/u</p>
+                  <p className="text-sm text-slate-600">${item.product.price.toFixed(2)} c/u</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-lg font-bold text-slate-900">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ${(item.product.price * item.quantity).toFixed(2)}
                 </p>
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function AdminOrderDetailPage() {
         <div className="mt-6 pt-6 border-t border-slate-200 space-y-3">
           <div className="flex justify-between text-slate-600">
             <span>Subtotal</span>
-            <span>${order.total.toFixed(2)}</span>
+            <span>${order.totalAmount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-slate-600">
             <span>Envío</span>
@@ -218,7 +218,7 @@ export default function AdminOrderDetailPage() {
               <DollarSign className="w-6 h-6" />
               <span>Total</span>
             </div>
-            <span className="text-blue-600">${order.total.toFixed(2)}</span>
+            <span className="text-blue-600">${order.totalAmount.toFixed(2)}</span>
           </div>
         </div>
       </div>
