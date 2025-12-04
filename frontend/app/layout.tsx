@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'La Receta Secreta - Helados y Postres Artesanales',
   description: 'Los mejores helados y postres artesanales',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
