@@ -56,7 +56,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in">
       {/* Imagen del producto y badges */}
       <div className="space-y-3">
-        <div className="relative h-[280px] bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl overflow-hidden shadow-lg group">
+        <div className="relative h-[350px] bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl overflow-hidden shadow-lg group">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
@@ -69,7 +69,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               {categoryEmoji}
             </div>
           )}
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md">
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md z-10">
             <span className="text-sm font-semibold text-primary-600 capitalize flex items-center gap-1.5">
               <span>{categoryEmoji}</span>
               <span>{product.category}</span>
@@ -78,7 +78,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Promotion Badge */}
           {product.isOnPromotion && (
-            <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full shadow-xl animate-pulse">
+            <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full shadow-xl animate-pulse z-10">
               <span className="text-sm font-bold flex items-center gap-2">
                 <span className="text-xl">🔥</span>
                 <span>¡OFERTA ESPECIAL!</span>

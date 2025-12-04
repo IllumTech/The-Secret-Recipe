@@ -149,6 +149,7 @@ async function createProduct(data: any): Promise<APIGatewayProxyResult> {
       price: parseFloat(data.price),
       description: data.description || '',
       image: data.image || '🍦',
+      imageUrl: data.imageUrl || '',
       isActive: true,
       isOnPromotion: data.isOnPromotion || false,
       createdAt: new Date().toISOString(),
@@ -217,6 +218,7 @@ async function updateProduct(id: string, data: any): Promise<APIGatewayProxyResu
     if (data.price !== undefined) updates.price = parseFloat(data.price);
     if (data.description !== undefined) updates.description = data.description;
     if (data.image !== undefined) updates.image = data.image;
+    if (data.imageUrl !== undefined) updates.imageUrl = data.imageUrl;
     if (data.isOnPromotion !== undefined) {
       updates.isOnPromotion = data.isOnPromotion;
       if (data.isOnPromotion && data.promotionalPrice !== undefined) {

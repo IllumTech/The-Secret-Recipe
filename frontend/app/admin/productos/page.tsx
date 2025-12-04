@@ -16,6 +16,11 @@ export default function ProductsListPage() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteAnimating, setDeleteAnimating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   // Abrir modal si viene el parámetro ?nuevo=true
   useEffect(() => {
@@ -33,10 +38,39 @@ export default function ProductsListPage() {
     ? activeProducts 
     : activeProducts.filter(p => p.category === filterCategory);
 
-  const handleDelete = (id: string) => {
-    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-      deleteProduct(id);
+  const handleDelete = (product: Product) => {
+    setProductToDelete(product);
+    setDeleteConfirmOpen(true);
+    setTimeout(() => setDeleteAnimating(true), 10);
+  };
+
+  const confirmDelete = async () => {
+    if (productToDelete) {
+      setIsDeleting(true);
+      try {
+        await deleteProduct(productToDelete.id);
+        // Pequeño delay para mostrar el éxito
+        setTimeout(() => {
+          setIsDeleting(false);
+          closeDeleteModal();
+        }, 500);
+      } catch (error) {
+        setIsDeleting(false);
+        alert('Error al eliminar el producto');
+      }
     }
+  };
+
+  const cancelDelete = () => {
+    closeDeleteModal();
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteAnimating(false);
+    setTimeout(() => {
+      setDeleteConfirmOpen(false);
+      setProductToDelete(null);
+    }, 300);
   };
 
   const handleOpenCreateModal = () => {
@@ -54,17 +88,27 @@ export default function ProductsListPage() {
     setEditingProduct(null);
   };
 
-  const handleSubmit = (data: Partial<Product>) => {
-    if (editingProduct) {
-      updateProduct(editingProduct.id, data);
-    } else {
-      addProduct(data as Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>);
+  const handleSubmit = async (data: Partial<Product>) => {
+    setIsSaving(true);
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, data);
+      } else {
+        await addProduct(data as Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'isActive'>);
+      }
+      // Pequeño delay para mostrar el éxito
+      setTimeout(() => {
+        setIsSaving(false);
+        handleCloseModal();
+      }, 500);
+    } catch (error) {
+      setIsSaving(false);
+      alert('Error al guardar el producto');
     }
-    handleCloseModal();
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -128,7 +172,17 @@ export default function ProductsListPage() {
                 <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="text-3xl">{product.image || '📦'}</div>
+                      {product.imageUrl ? (
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+                          <img 
+                            src={product.imageUrl} 
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-3xl">{product.category === 'helado' ? '🍦' : '🍰'}</div>
+                      )}
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <div className="font-medium text-slate-900">{product.name}</div>
@@ -176,7 +230,7 @@ export default function ProductsListPage() {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => handleDelete(product)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -206,8 +260,74 @@ export default function ProductsListPage() {
           product={editingProduct || undefined}
           onSubmit={handleSubmit}
           onCancel={handleCloseModal}
+          isLoading={isSaving}
         />
       </Modal>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmOpen && productToDelete && (
+        <div 
+          className={`fixed inset-0 bg-black flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${
+            deleteAnimating ? 'bg-opacity-50' : 'bg-opacity-0'
+          }`}
+          onClick={cancelDelete}
+        >
+          <div 
+            className={`bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transition-all duration-300 ${
+              deleteAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">Eliminar Producto</h3>
+                <p className="text-sm text-slate-600">Esta acción no se puede deshacer</p>
+              </div>
+            </div>
+            
+            <div className="bg-slate-50 rounded-lg p-4 mb-6">
+              <p className="text-slate-700 mb-2">¿Estás seguro de que deseas eliminar este producto?</p>
+              <div className="flex items-center gap-3 mt-3 p-3 bg-white rounded-lg border border-slate-200">
+                <div className="text-2xl">{productToDelete.image || '📦'}</div>
+                <div>
+                  <p className="font-semibold text-slate-900">{productToDelete.name}</p>
+                  <p className="text-sm text-slate-500">${productToDelete.price.toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={cancelDelete}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium disabled:opacity-75 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Eliminando...</span>
+                  </>
+                ) : (
+                  'Eliminar'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

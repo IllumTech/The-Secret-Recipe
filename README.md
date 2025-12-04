@@ -140,7 +140,7 @@ The-Secret-Recipe/
 - **Database**: Amazon DynamoDB
 - **Storage**: Amazon S3
 - **API**: Amazon API Gateway
-- **AI**: Amazon Bedrock (Claude 3 Sonnet, Stable Diffusion XL)
+- **AI**: Amazon Bedrock (Claude 3 Sonnet, Amazon Nova Canvas)
 
 ## 🎯 Funcionalidades
 
@@ -163,7 +163,7 @@ The-Secret-Recipe/
 - ✅ Generación automática de descripciones de productos
 - ✅ Generación de imágenes de productos
 - ✅ Integración con AWS Bedrock
-- ✅ Modelos: Claude 3 Sonnet y Stable Diffusion XL
+- ✅ Modelos: Claude 3 Sonnet y Amazon Nova Canvas
 
 ## 📊 API Endpoints
 

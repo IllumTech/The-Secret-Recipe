@@ -112,31 +112,29 @@ Escribe solo la descripción, sin introducción ni conclusión.`;
   }
 }
 
-// Generate product image using Stable Diffusion
+// Generate product image using Amazon Nova Canvas
 async function generateImage(productName: string, category: string): Promise<string> {
   try {
     const prompt = `A professional, appetizing photo of ${productName}, a delicious ${category}. High quality food photography, well-lit, clean background, studio lighting, commercial product shot, 4k, detailed texture`;
 
     const payload = {
-      text_prompts: [
-        {
-          text: prompt,
-          weight: 1
-        },
-        {
-          text: "blurry, low quality, distorted, ugly, bad composition",
-          weight: -1
-        }
-      ],
-      cfg_scale: 10,
-      steps: 50,
-      seed: Math.floor(Math.random() * 1000000),
-      width: 512,
-      height: 512
+      taskType: "TEXT_IMAGE",
+      textToImageParams: {
+        text: prompt,
+        negativeText: "blurry, low quality, distorted, ugly, bad composition, text, watermark"
+      },
+      imageGenerationConfig: {
+        numberOfImages: 1,
+        quality: "standard",
+        height: 1024,
+        width: 1024,
+        cfgScale: 8.0,
+        seed: Math.floor(Math.random() * 2147483647)
+      }
     };
 
     const command = new InvokeModelCommand({
-      modelId: 'stability.stable-diffusion-xl-v1',
+      modelId: 'amazon.nova-canvas-v1:0',
       contentType: 'application/json',
       accept: 'application/json',
       body: JSON.stringify(payload)
@@ -145,8 +143,8 @@ async function generateImage(productName: string, category: string): Promise<str
     const response = await bedrockClient.send(command);
     const responseBody = JSON.parse(new TextDecoder().decode(response.body));
     
-    // Get base64 image
-    const base64Image = responseBody.artifacts[0].base64;
+    // Get base64 image from Nova Canvas response
+    const base64Image = responseBody.images[0];
     const imageBuffer = Buffer.from(base64Image, 'base64');
 
     // Upload to S3
