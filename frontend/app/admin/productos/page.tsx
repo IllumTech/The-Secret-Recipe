@@ -112,8 +112,8 @@ export default function ProductsListPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Productos</h1>
-          <p className="text-slate-600">Gestiona tu catálogo de productos</p>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">Productos</h1>
+          <p className="text-slate-600 dark:text-slate-400">Gestiona tu catálogo de productos</p>
         </div>
         <Button onClick={handleOpenCreateModal} className="flex items-center gap-2">
           <Plus className="w-5 h-5" />
@@ -122,10 +122,10 @@ export default function ProductsListPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-slate-200 dark:border-gray-700">
         <div className="flex items-center gap-4">
-          <Filter className="w-5 h-5 text-slate-600" />
-          <span className="text-sm font-medium text-slate-700">Filtrar por:</span>
+          <Filter className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Filtrar por:</span>
           <div className="flex gap-2">
             <FilterButton
               active={filterCategory === 'all'}
@@ -156,24 +156,24 @@ export default function ProductsListPage() {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Producto</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Categoría</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Precio</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700">Acciones</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Producto</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Categoría</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Precio</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700 dark:text-slate-300">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
               {filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {product.imageUrl ? (
-                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-gray-700 flex-shrink-0">
                           <img 
                             src={product.imageUrl} 
                             alt={product.name}
@@ -185,14 +185,14 @@ export default function ProductsListPage() {
                       )}
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <div className="font-medium text-slate-900">{product.name}</div>
+                          <div className="font-medium text-slate-900 dark:text-slate-100">{product.name}</div>
                           {product.isOnPromotion && (
                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse">
                               🔥 OFERTA
                             </span>
                           )}
                         </div>
-                        <div className="text-sm text-slate-500 line-clamp-1">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
                           {product.description || 'Sin descripción'}
                         </div>
                       </div>
@@ -210,28 +210,28 @@ export default function ProductsListPage() {
                   <td className="px-6 py-4">
                     {product.isOnPromotion && product.promotionalPrice ? (
                       <div>
-                        <div className="text-sm text-slate-400 line-through">
+                        <div className="text-sm text-slate-400 dark:text-slate-500 line-through">
                           ${product.price.toFixed(2)}
                         </div>
-                        <div className="font-semibold text-red-600">
+                        <div className="font-semibold text-red-600 dark:text-red-400">
                           ${product.promotionalPrice.toFixed(2)}
                         </div>
                       </div>
                     ) : (
-                      <span className="font-semibold text-slate-900">${product.price.toFixed(2)}</span>
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">${product.price.toFixed(2)}</span>
                     )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleOpenEditModal(product)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(product)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -244,7 +244,7 @@ export default function ProductsListPage() {
         </div>
 
         {filteredProducts.length === 0 && (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-slate-500 dark:text-slate-400">
             <p>No se encontraron productos</p>
           </div>
         )}
@@ -273,28 +273,28 @@ export default function ProductsListPage() {
           onClick={cancelDelete}
         >
           <div 
-            className={`bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transition-all duration-300 ${
+            className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 transition-all duration-300 ${
               deleteAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900">Eliminar Producto</h3>
-                <p className="text-sm text-slate-600">Esta acción no se puede deshacer</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Eliminar Producto</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Esta acción no se puede deshacer</p>
               </div>
             </div>
             
-            <div className="bg-slate-50 rounded-lg p-4 mb-6">
-              <p className="text-slate-700 mb-2">¿Estás seguro de que deseas eliminar este producto?</p>
-              <div className="flex items-center gap-3 mt-3 p-3 bg-white rounded-lg border border-slate-200">
+            <div className="bg-slate-50 dark:bg-gray-900 rounded-lg p-4 mb-6">
+              <p className="text-slate-700 dark:text-slate-300 mb-2">¿Estás seguro de que deseas eliminar este producto?</p>
+              <div className="flex items-center gap-3 mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700">
                 <div className="text-2xl">{productToDelete.image || '📦'}</div>
                 <div>
-                  <p className="font-semibold text-slate-900">{productToDelete.name}</p>
-                  <p className="text-sm text-slate-500">${productToDelete.price.toFixed(2)}</p>
+                  <p className="font-semibold text-slate-900 dark:text-slate-100">{productToDelete.name}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">${productToDelete.price.toFixed(2)}</p>
                 </div>
               </div>
             </div>
@@ -303,14 +303,14 @@ export default function ProductsListPage() {
               <button
                 onClick={cancelDelete}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-gray-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmDelete}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium disabled:opacity-75 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 bg-red-600 dark:bg-red-700 text-white rounded-xl hover:bg-red-700 dark:hover:bg-red-800 transition-colors font-medium disabled:opacity-75 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isDeleting ? (
                   <>
@@ -346,8 +346,8 @@ function FilterButton({
       onClick={onClick}
       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
         active
-          ? 'bg-blue-600 text-white shadow-md'
-          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
+          : 'bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-gray-600'
       }`}
     >
       {children}

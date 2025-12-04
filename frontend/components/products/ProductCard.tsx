@@ -45,9 +45,9 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
   return (
     <div 
       onClick={handleCardClick}
-      className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 animate-fade-in cursor-pointer"
+      className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 animate-fade-in cursor-pointer"
     >
-      <div className="relative h-56 w-full bg-white overflow-hidden">
+      <div className="relative h-56 w-full bg-white dark:bg-gray-700 overflow-hidden">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -60,8 +60,8 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
             {categoryEmoji}
           </div>
         )}
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-          <span className="text-sm font-semibold text-primary-600 capitalize">
+        <div className="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1 rounded-full">
+          <span className="text-sm font-semibold text-primary-600 dark:text-primary-400 capitalize">
             {categoryEmoji} {product.category}
           </span>
         </div>
@@ -79,25 +79,25 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
             <div className="relative">
               <button
                 onClick={handleAdd}
-                className="w-10 h-10 bg-white hover:bg-primary-500 text-primary-600 hover:text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-100 ease-out flex items-center justify-center font-bold text-xl transform hover:scale-110 active:scale-95"
+                className="w-10 h-10 bg-white dark:bg-gray-700 hover:bg-primary-500 dark:hover:bg-primary-600 text-primary-600 dark:text-primary-400 hover:text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-100 ease-out flex items-center justify-center font-bold text-xl transform hover:scale-110 active:scale-95"
               >
                 +
               </button>
               
               {/* Tooltip "Agregar" en hover */}
               {isHovered && (
-                <div className="absolute top-12 right-0 bg-gray-900 text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap animate-fade-in">
+                <div className="absolute top-12 right-0 bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap animate-fade-in">
                   Agregar
-                  <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+                  <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 dark:bg-gray-700 transform rotate-45"></div>
                 </div>
               )}
             </div>
           ) : (
             // Estado con cantidad: Mostrar controles completos
-            <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full shadow-lg px-2 py-1 transition-all duration-100">
+            <div className="flex items-center gap-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-full shadow-lg px-2 py-1 transition-all duration-100">
               <button
                 onClick={handleSubtract}
-                className="w-8 h-8 bg-white hover:bg-red-500 hover:shadow-lg text-red-500 hover:text-white rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
+                className="w-8 h-8 bg-white dark:bg-gray-700 hover:bg-red-500 hover:shadow-lg text-red-500 dark:text-red-400 hover:text-white rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
                 title={cartQuantity === 1 ? 'Eliminar' : 'Restar'}
               >
                 {cartQuantity === 1 ? (
@@ -107,13 +107,13 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
                 ) : '−'}
               </button>
               
-              <span className="min-w-[24px] text-center font-bold text-gray-900 transition-all duration-100">
+              <span className="min-w-[24px] text-center font-bold text-gray-900 dark:text-gray-100 transition-all duration-100">
                 {cartQuantity}
               </span>
               
               <button
                 onClick={handleAdd}
-                className="w-8 h-8 bg-white hover:bg-primary-500 hover:shadow-lg text-primary-600 hover:text-white rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
+                className="w-8 h-8 bg-white dark:bg-gray-700 hover:bg-primary-500 dark:hover:bg-primary-600 hover:shadow-lg text-primary-600 dark:text-primary-400 hover:text-white rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
                 title="Agregar más"
               >
                 +
@@ -124,12 +124,12 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
       </div>
       
       <div className="p-5">
-        <h3 className="text-lg font-bold text-gray-900 hover:text-primary-600 transition-colors line-clamp-2 min-h-[3.5rem] font-display">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors line-clamp-2 min-h-[3.5rem] font-display">
           {product.name}
         </h3>
         
         {product.description && (
-          <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">
             {product.description}
           </p>
         )}
@@ -139,23 +139,23 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg text-gray-500 line-through">
+                  <span className="text-lg text-gray-500 dark:text-gray-400 line-through">
                     ${product.price.toFixed(2)}
                   </span>
-                  <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                  <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold px-2 py-0.5 rounded-full">
                     -{getDiscountPercentage(product)}%
                   </span>
                 </div>
-                <span className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                <span className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400 bg-clip-text text-transparent">
                   ${product.promotionalPrice.toFixed(2)}
                 </span>
               </div>
-              <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2 py-1 rounded-md shadow-md whitespace-nowrap self-center">
+              <span className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white text-xs font-bold px-2 py-1 rounded-md shadow-md whitespace-nowrap self-center">
                 🔥 OFERTA
               </span>
             </div>
           ) : (
-            <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+            <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 dark:from-primary-400 dark:to-accent-400 bg-clip-text text-transparent">
               ${product.price.toFixed(2)}
             </span>
           )}
