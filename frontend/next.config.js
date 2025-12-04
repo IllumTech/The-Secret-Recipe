@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -12,7 +14,6 @@ const nextConfig = {
       },
     ],
   },
-  // Removed standalone output for Amplify compatibility
 }
 
 module.exports = nextConfig
