@@ -117,16 +117,22 @@ async function createOrder(data: any): Promise<APIGatewayProxyResult> {
         zipCode: data.deliveryAddress.zipCode || ''
       },
       items: data.items.map((item: any) => ({
-        productId: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.image || '🍦'
+        product: {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image || '🍦',
+          category: item.category || 'helado',
+          isActive: true,
+          isOnPromotion: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        quantity: item.quantity
       })),
-      total: parseFloat(total.toFixed(2)),
+      totalAmount: parseFloat(total.toFixed(2)),
       status: 'pending',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: new Date().toISOString()
     };
 
     const command = new PutCommand({

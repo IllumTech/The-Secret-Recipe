@@ -9,19 +9,25 @@ import * as api from '@/lib/api';
 
 export default function AdminDashboard() {
   const { products } = useProducts();
-  const { data: orders = [] } = useSWR<Order[]>('orders', api.getOrders);
+  const { data: rawOrders = [] } = useSWR<any[]>('orders', api.getOrders);
+  
+  // Normalize orders to handle both 'total' and 'totalAmount' fields
+  const orders = rawOrders.map(order => ({
+    ...order,
+    totalAmount: order.totalAmount ?? order.total ?? 0
+  }));
   
   const totalProducts = products.length;
   const activeProducts = products.filter(p => p.isActive).length;
   const totalOrders = orders.length;
-  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
 
   return (
     <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-4xl font-bold text-slate-900 mb-2">Dashboard</h1>
-        <p className="text-slate-600">Resumen general de tu tienda</p>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">Dashboard</h1>
+        <p className="text-slate-600 dark:text-slate-400">Resumen general de tu tienda</p>
       </div>
 
       {/* Stats Grid */}
@@ -57,8 +63,8 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-        <h2 className="text-2xl font-bold text-slate-900 mb-6">Acciones Rápidas</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-slate-200 dark:border-gray-700">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Acciones Rápidas</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <QuickActionButton
             href="/admin/productos?nuevo=true"
@@ -85,9 +91,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-        <h2 className="text-2xl font-bold text-slate-900 mb-6">Actividad Reciente</h2>
-        <div className="text-center py-12 text-slate-500">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-slate-200 dark:border-gray-700">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Actividad Reciente</h2>
+        <div className="text-center py-12 text-slate-500 dark:text-slate-400">
           <ShoppingCart className="w-16 h-16 mx-auto mb-4 opacity-30" />
           <p>No hay actividad reciente</p>
         </div>
@@ -117,7 +123,7 @@ function StatCard({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200 hover:shadow-xl transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-slate-200 dark:border-gray-700 hover:shadow-xl transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className={`p-3 rounded-xl ${colorClasses[color].split(' ')[2]}`}>
           <div className={colorClasses[color].split(' ')[1]}>
@@ -125,9 +131,9 @@ function StatCard({
           </div>
         </div>
       </div>
-      <h3 className="text-slate-600 text-sm font-medium mb-1">{title}</h3>
-      <p className="text-3xl font-bold text-slate-900 mb-1">{value}</p>
-      {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+      <h3 className="text-slate-600 dark:text-slate-400 text-sm font-medium mb-1">{title}</h3>
+      <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{value}</p>
+      {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
     </div>
   );
 }

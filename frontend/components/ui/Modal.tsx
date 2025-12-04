@@ -38,30 +38,30 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
           isAnimating ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
       />
       
       {/* Modal */}
-      <div className={`relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col transition-all duration-300 ${
+      <div className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-gray-900/50 max-w-4xl w-full max-h-[90vh] flex flex-col transition-all duration-300 ${
         isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
       }`}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 rounded-t-2xl bg-gradient-to-r from-slate-50 to-white">
-          <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 dark:border-gray-700 rounded-t-2xl bg-gradient-to-r from-slate-50 to-white dark:from-gray-800 dark:to-gray-800">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-gray-100">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             aria-label="Cerrar"
           >
-            <X className="w-5 h-5 text-slate-600" />
+            <X className="w-5 h-5 text-slate-600 dark:text-gray-400" />
           </button>
         </div>
         
         {/* Content */}
-        <div className="p-6 overflow-y-auto">
+        <div className="p-6 overflow-y-auto text-gray-900 dark:text-gray-100">
           {children}
         </div>
       </div>

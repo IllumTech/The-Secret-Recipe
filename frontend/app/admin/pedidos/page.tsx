@@ -7,13 +7,19 @@ import { Order } from '@/lib/types';
 import * as api from '@/lib/api';
 import Link from 'next/link';
 
-type OrderStatus = 'all' | 'pending' | 'completed' | 'cancelled';
+type OrderStatus = 'all' | 'pending' | 'processing' | 'completed' | 'cancelled';
 
 export default function OrdersListPage() {
-  const { data: orders = [], error, isLoading } = useSWR<Order[]>('orders', api.getOrders, {
+  const { data: rawOrders = [], error, isLoading } = useSWR<any[]>('orders', api.getOrders, {
     refreshInterval: 30000, // Refresh every 30 seconds
   });
   const [filterStatus, setFilterStatus] = useState<OrderStatus>('all');
+
+  // Normalize orders to handle both 'total' and 'totalAmount' fields
+  const orders: Order[] = rawOrders.map(order => ({
+    ...order,
+    totalAmount: order.totalAmount ?? order.total ?? 0
+  }));
 
   const filteredOrders = filterStatus === 'all' 
     ? orders 
@@ -23,8 +29,8 @@ export default function OrdersListPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Cargando pedidos...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400 mx-auto mb-4"></div>
+          <p className="text-slate-600 dark:text-slate-400">Cargando pedidos...</p>
         </div>
       </div>
     );
@@ -33,7 +39,7 @@ export default function OrdersListPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center text-red-600">
+        <div className="text-center text-red-600 dark:text-red-400">
           <p className="text-xl font-semibold mb-2">Error al cargar pedidos</p>
           <p className="text-sm">{error.message}</p>
         </div>
@@ -43,31 +49,36 @@ export default function OrdersListPage() {
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      pending: 'bg-yellow-100 text-yellow-700',
-      completed: 'bg-green-100 text-green-700',
-      cancelled: 'bg-red-100 text-red-700',
+      pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+      processing: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+      completed: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+      cancelled: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
     };
     const labels = {
       pending: 'Pendiente',
+      processing: 'En Proceso',
       completed: 'Completado',
       cancelled: 'Cancelado',
     };
-    return { class: badges[status as keyof typeof badges], label: labels[status as keyof typeof labels] };
+    return { 
+      class: badges[status as keyof typeof badges] || 'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300', 
+      label: labels[status as keyof typeof labels] || status 
+    };
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-slate-900 mb-2">Pedidos</h1>
-        <p className="text-slate-600">Gestiona los pedidos de tus clientes</p>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">Pedidos</h1>
+        <p className="text-slate-600 dark:text-slate-400">Gestiona los pedidos de tus clientes</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-slate-200 dark:border-gray-700">
         <div className="flex items-center gap-4">
-          <Filter className="w-5 h-5 text-slate-600" />
-          <span className="text-sm font-medium text-slate-700">Filtrar por estado:</span>
+          <Filter className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Filtrar por estado:</span>
           <div className="flex gap-2">
             <FilterButton
               active={filterStatus === 'all'}
@@ -80,6 +91,12 @@ export default function OrdersListPage() {
               onClick={() => setFilterStatus('pending')}
             >
               Pendientes ({orders.filter(o => o.status === 'pending').length})
+            </FilterButton>
+            <FilterButton
+              active={filterStatus === 'processing'}
+              onClick={() => setFilterStatus('processing')}
+            >
+              En Proceso ({orders.filter(o => o.status === 'processing').length})
             </FilterButton>
             <FilterButton
               active={filterStatus === 'completed'}
@@ -98,28 +115,28 @@ export default function OrdersListPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Número de Pedido</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Cliente</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Fecha</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Items</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Total</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Estado</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Número de Pedido</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Cliente</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Fecha</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Items</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Total</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Estado</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
               {filteredOrders.map((order) => {
                 const statusBadge = getStatusBadge(order.status);
                 return (
-                  <tr key={order.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4">
                       <Link
                         href={`/admin/pedidos/${order.id}`}
-                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
+                        className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium hover:underline transition-colors"
                       >
                         <Package className="w-4 h-4" />
                         {order.orderNumber}
@@ -127,26 +144,26 @@ export default function OrdersListPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-slate-400" />
+                        <User className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         <div>
-                          <div className="font-medium text-slate-900">{order.customerName}</div>
-                          <div className="text-sm text-slate-500">{order.customerEmail}</div>
+                          <div className="font-medium text-slate-900 dark:text-slate-100">{order.customerName}</div>
+                          <div className="text-sm text-slate-500 dark:text-slate-400">{order.customerEmail}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-slate-600">
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                         <Calendar className="w-4 h-4" />
                         <span>{new Date(order.createdAt).toLocaleDateString('es-ES')}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-slate-900">{order.items.length} items</span>
+                      <span className="text-slate-900 dark:text-slate-100">{order.items.length} items</span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 font-semibold text-slate-900">
+                      <div className="flex items-center gap-1 font-semibold text-slate-900 dark:text-slate-100">
                         <DollarSign className="w-4 h-4" />
-                        {order.total.toFixed(2)}
+                        {order.totalAmount.toFixed(2)}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -162,7 +179,7 @@ export default function OrdersListPage() {
         </div>
 
         {filteredOrders.length === 0 && (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-slate-500 dark:text-slate-400">
             <Package className="w-16 h-16 mx-auto mb-4 opacity-30" />
             <p>No se encontraron pedidos</p>
           </div>
@@ -186,8 +203,8 @@ function FilterButton({
       onClick={onClick}
       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
         active
-          ? 'bg-blue-600 text-white shadow-md'
-          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
+          : 'bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-gray-600'
       }`}
     >
       {children}
