@@ -79,7 +79,7 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
             <div className="relative">
               <button
                 onClick={handleAdd}
-                className="w-10 h-10 bg-white hover:bg-primary-500 text-primary-600 hover:text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center font-bold text-xl"
+                className="w-10 h-10 bg-white hover:bg-primary-500 text-primary-600 hover:text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-100 ease-out flex items-center justify-center font-bold text-xl transform hover:scale-110 active:scale-95"
               >
                 +
               </button>
@@ -94,10 +94,10 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
             </div>
           ) : (
             // Estado con cantidad: Mostrar controles completos
-            <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full shadow-lg px-2 py-1">
+            <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full shadow-lg px-2 py-1 transition-all duration-100">
               <button
                 onClick={handleSubtract}
-                className="w-8 h-8 bg-white hover:bg-red-500 hover:shadow-lg text-red-500 hover:text-white rounded-full transition-all duration-200 flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
+                className="w-8 h-8 bg-white hover:bg-red-500 hover:shadow-lg text-red-500 hover:text-white rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
                 title={cartQuantity === 1 ? 'Eliminar' : 'Restar'}
               >
                 {cartQuantity === 1 ? (
@@ -107,13 +107,13 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
                 ) : '−'}
               </button>
               
-              <span className="min-w-[24px] text-center font-bold text-gray-900">
+              <span className="min-w-[24px] text-center font-bold text-gray-900 transition-all duration-100">
                 {cartQuantity}
               </span>
               
               <button
                 onClick={handleAdd}
-                className="w-8 h-8 bg-white hover:bg-primary-500 hover:shadow-lg text-primary-600 hover:text-white rounded-full transition-all duration-200 flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
+                className="w-8 h-8 bg-white hover:bg-primary-500 hover:shadow-lg text-primary-600 hover:text-white rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
                 title="Agregar más"
               >
                 +
