@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Plus, Edit, Trash2, Filter } from 'lucide-react';
 import { useProducts } from '@/contexts/ProductContext';
@@ -9,7 +9,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import ProductForm from '@/components/products/ProductForm';
 
-export default function ProductsListPage() {
+function ProductsListContent() {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -329,6 +329,21 @@ export default function ProductsListPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProductsListPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Cargando productos...</p>
+        </div>
+      </div>
+    }>
+      <ProductsListContent />
+    </Suspense>
   );
 }
 

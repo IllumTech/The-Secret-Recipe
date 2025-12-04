@@ -68,8 +68,9 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       // Prepare data for submission
       const submitData = {
         ...formData,
+        price: Number(formData.price),
         // Only include promotionalPrice if promotion is enabled
-        promotionalPrice: formData.isOnPromotion ? formData.promotionalPrice : undefined,
+        promotionalPrice: formData.isOnPromotion && formData.promotionalPrice ? Number(formData.promotionalPrice) : undefined,
       };
       onSubmit(submitData);
     }
@@ -295,18 +296,18 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
               {errors.promotionalPrice && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.promotionalPrice}</p>}
             </div>
 
-            {formData.price > 0 && formData.promotionalPrice > 0 && formData.promotionalPrice < formData.price && (
+            {Number(formData.price) > 0 && Number(formData.promotionalPrice) > 0 && Number(formData.promotionalPrice) < Number(formData.price) && (
               <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-300 dark:border-red-700">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600 dark:text-slate-400">Descuento:</span>
                   <span className="text-lg font-bold text-red-600 dark:text-red-400">
-                    {Math.round(((formData.price - formData.promotionalPrice) / formData.price) * 100)}% OFF
+                    {Math.round(((Number(formData.price) - Number(formData.promotionalPrice)) / Number(formData.price)) * 100)}% OFF
                   </span>
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-sm text-slate-600 dark:text-slate-400">Ahorras:</span>
                   <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                    ${(formData.price - formData.promotionalPrice).toFixed(2)}
+                    ${(Number(formData.price) - Number(formData.promotionalPrice)).toFixed(2)}
                   </span>
                 </div>
               </div>
