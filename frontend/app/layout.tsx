@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/contexts/CartContext';
 import { ProductProvider } from '@/contexts/ProductContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -18,15 +19,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme-preference') || 'system';
+                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  const resolvedTheme = theme === 'system' ? systemTheme : theme;
+                  if (resolvedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
-        <ProductProvider>
-          <CartProvider>
-            <ConditionalLayout>
-              {children}
-            </ConditionalLayout>
-          </CartProvider>
-        </ProductProvider>
+        <ThemeProvider>
+          <ProductProvider>
+            <CartProvider>
+              <ConditionalLayout>
+                {children}
+              </ConditionalLayout>
+            </CartProvider>
+          </ProductProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
