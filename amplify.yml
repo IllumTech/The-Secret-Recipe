@@ -12,7 +12,7 @@ applications:
           commands:
             - NODE_OPTIONS="--max-old-space-size=4096" npm run build
       artifacts:
-        baseDirectory: frontend
+        baseDirectory: .next
         files:
           - '**/*'
       cache:
