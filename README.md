@@ -14,7 +14,7 @@ Una plataforma e-commerce moderna para venta de helados y postres, potenciada po
 - **⚡ Serverless**: Arquitectura 100% serverless con AWS Lambda, DynamoDB y S3
 - **🎨 UI Moderna**: Interfaz elegante con Next.js 15, React 19 y Tailwind CSS
 - **📱 Responsive**: Diseño adaptable para móvil, tablet y escritorio
-- **🔐 Admin Panel**: Panel de administración completo para gestión de productos y pedidos
+- **🔐 Admin Panel**: Panel de administración completo para gestión de productos y pedidos.
 
 ## 🏗️ Arquitectura
 
