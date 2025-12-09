@@ -143,12 +143,12 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
       />
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Información del Cliente</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Información del Cliente</h2>
         
         <div className="space-y-4">
           <div>
-            <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Nombre Completo *
             </label>
             <input
@@ -157,18 +157,18 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
               name="customerName"
               value={formData.customerName}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                errors.customerName ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 ${
+                errors.customerName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Juan Pérez"
             />
             {errors.customerName && (
-              <p className="mt-1 text-sm text-red-600">{errors.customerName}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.customerName}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Email *
             </label>
             <input
@@ -177,18 +177,18 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 ${
+                errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="juan@ejemplo.com"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Teléfono *
             </label>
             <input
@@ -197,24 +197,24 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 ${
+                errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="+1 234 567 8900"
             />
             {errors.phone && (
-              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>
             )}
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Dirección de Entrega</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Dirección de Entrega</h2>
         
         <div className="space-y-4">
           <div>
-            <label htmlFor="street" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="street" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Calle y Número *
             </label>
             <input
@@ -223,19 +223,19 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
               name="street"
               value={formData.street}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                errors.street ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 ${
+                errors.street ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="Av. Principal 123"
             />
             {errors.street && (
-              <p className="mt-1 text-sm text-red-600">{errors.street}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.street}</p>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Ciudad *
               </label>
               <input
@@ -244,18 +244,18 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                  errors.city ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 ${
+                  errors.city ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
                 placeholder="Ciudad de México"
               />
               {errors.city && (
-                <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.city}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="state" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Estado *
               </label>
               <input
@@ -264,19 +264,19 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                  errors.state ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 ${
+                  errors.state ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
                 placeholder="CDMX"
               />
               {errors.state && (
-                <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.state}</p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Código Postal *
             </label>
             <input
@@ -285,13 +285,13 @@ export default function CheckoutForm({ onOrderComplete }: CheckoutFormProps) {
               name="zipCode"
               value={formData.zipCode}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                errors.zipCode ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 ${
+                errors.zipCode ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
               placeholder="12345"
             />
             {errors.zipCode && (
-              <p className="mt-1 text-sm text-red-600">{errors.zipCode}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.zipCode}</p>
             )}
           </div>
         </div>

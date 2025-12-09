@@ -204,7 +204,7 @@ function ProductsListContent() {
                         ? 'bg-blue-100 text-blue-700' 
                         : 'bg-purple-100 text-purple-700'
                     }`}>
-                      {product.category === 'helado' ? '🍦 Helado' : '🍰 Postre'}
+                      {product.category === 'helado' ? 'Helado' : 'Postre'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
