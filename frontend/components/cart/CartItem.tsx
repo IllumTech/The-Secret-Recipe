@@ -17,8 +17,18 @@ export default function CartItem({ item }: CartItemProps) {
 
   return (
     <div className="flex gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg dark:shadow-gray-900/50 transition-shadow duration-300">
-      <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex items-center justify-center text-4xl">
-        {categoryEmoji}
+      <div className="flex-shrink-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg overflow-hidden">
+        {product.imageUrl ? (
+          <img 
+            src={product.imageUrl} 
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-4xl">
+            {categoryEmoji}
+          </div>
+        )}
       </div>
       
       <div className="flex-1">
