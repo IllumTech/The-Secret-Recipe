@@ -67,19 +67,21 @@ export default function OrdersListPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">Pedidos</h1>
-        <p className="text-slate-600 dark:text-slate-400">Gestiona los pedidos de tus clientes</p>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-1 sm:mb-2">Pedidos</h1>
+        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Gestiona los pedidos de tus clientes</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-slate-200 dark:border-gray-700">
-        <div className="flex items-center gap-4">
-          <Filter className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Filtrar por estado:</span>
-          <div className="flex gap-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border border-slate-200 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400 flex-shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">Filtrar por estado:</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
             <FilterButton
               active={filterStatus === 'all'}
               onClick={() => setFilterStatus('all')}
@@ -114,9 +116,10 @@ export default function OrdersListPage() {
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Orders List - Desktop Table / Mobile Cards */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50 dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700">
               <tr>
@@ -178,10 +181,63 @@ export default function OrdersListPage() {
           </table>
         </div>
 
+        {/* Mobile Card View */}
+        <div className="lg:hidden divide-y divide-slate-200 dark:divide-gray-700">
+          {filteredOrders.map((order) => {
+            const statusBadge = getStatusBadge(order.status);
+            return (
+              <Link
+                key={order.id}
+                href={`/admin/pedidos/${order.id}`}
+                className="block p-4 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <div className="space-y-3">
+                  {/* Header: Order Number & Status */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
+                      <Package className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm">{order.orderNumber}</span>
+                    </div>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge.class} flex-shrink-0`}>
+                      {statusBadge.label}
+                    </span>
+                  </div>
+
+                  {/* Customer Info */}
+                  <div className="flex items-start gap-2">
+                    <User className="w-4 h-4 text-slate-400 dark:text-slate-500 flex-shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-slate-900 dark:text-slate-100 text-sm truncate">{order.customerName}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 truncate">{order.customerEmail}</div>
+                    </div>
+                  </div>
+
+                  {/* Date, Items & Total */}
+                  <div className="flex items-center justify-between text-xs sm:text-sm">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>{new Date(order.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}</span>
+                      </div>
+                      <div className="text-slate-600 dark:text-slate-300">
+                        {order.items.length} items
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 font-bold text-slate-900 dark:text-slate-100">
+                      <DollarSign className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>{order.totalAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
         {filteredOrders.length === 0 && (
           <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-            <Package className="w-16 h-16 mx-auto mb-4 opacity-30" />
-            <p>No se encontraron pedidos</p>
+            <Package className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 opacity-30" />
+            <p className="text-sm sm:text-base">No se encontraron pedidos</p>
           </div>
         )}
       </div>
@@ -201,7 +257,7 @@ function FilterButton({
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
         active
           ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
           : 'bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-gray-600'
