@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { CartItem as CartItemType } from '@/lib/types';
 import { useCart } from '@/hooks/useCart';
 import { getDisplayPrice } from '@/lib/pricing';
@@ -14,6 +15,32 @@ export default function CartItem({ item }: CartItemProps) {
   const displayPrice = getDisplayPrice(product);
   const subtotal = displayPrice * quantity;
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
+  const [inputValue, setInputValue] = React.useState(quantity.toString());
+
+  React.useEffect(() => {
+    setInputValue(quantity.toString());
+  }, [quantity]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    if (value === '') return;
+    
+    const numValue = parseInt(value);
+    if (!isNaN(numValue)) {
+      updateQuantity(product.id, Math.max(1, Math.min(100, numValue)));
+    }
+  };
+
+  const handleInputBlur = () => {
+    if (inputValue === '' || parseInt(inputValue) < 1) {
+      updateQuantity(product.id, 1);
+      setInputValue('1');
+    } else {
+      setInputValue(quantity.toString());
+    }
+  };
 
   return (
     <div className="flex gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg dark:shadow-gray-900/50 transition-shadow duration-300">
@@ -72,7 +99,15 @@ export default function CartItem({ item }: CartItemProps) {
             </svg>
           </button>
           
-          <span className="w-12 text-center font-semibold text-gray-800 dark:text-gray-100">{quantity}</span>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            className="w-14 text-center font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none py-1"
+          />
           
           <button
             onClick={() => updateQuantity(product.id, quantity + 1)}
