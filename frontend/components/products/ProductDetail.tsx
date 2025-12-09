@@ -69,6 +69,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               {categoryEmoji}
             </div>
           )}
+          {/* Category Badge */}
           <div className="absolute top-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md z-10">
             <span className="text-sm font-semibold text-primary-600 dark:text-primary-400 capitalize flex items-center gap-1.5">
               <span>{categoryEmoji}</span>
@@ -78,11 +79,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Promotion Badge */}
           {product.isOnPromotion && (
-            <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white px-4 py-2 rounded-full shadow-xl animate-pulse z-10">
-              <span className="text-sm font-bold flex items-center gap-2">
-                <span className="text-xl">🔥</span>
-                <span>¡OFERTA ESPECIAL!</span>
-              </span>
+            <div className="absolute top-4 left-4 right-4 flex justify-start">
+              <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-xl animate-pulse max-w-[calc(100%-5rem)]">
+                <span className="text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+                  <span className="text-base sm:text-xl">🔥</span>
+                  <span className="truncate">¡OFERTA ESPECIAL!</span>
+                </span>
+              </div>
             </div>
           )}
         </div>
