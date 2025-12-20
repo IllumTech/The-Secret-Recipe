@@ -108,25 +108,27 @@ function ProductsListContent() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">Productos</h1>
-          <p className="text-slate-600 dark:text-slate-400">Gestiona tu catálogo de productos</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-1 sm:mb-2">Productos</h1>
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Gestiona tu catálogo de productos</p>
         </div>
-        <Button onClick={handleOpenCreateModal} className="flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          Crear Nuevo Producto
+        <Button onClick={handleOpenCreateModal} className="flex items-center justify-center gap-2 w-full sm:w-auto">
+          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="text-sm sm:text-base">Crear Nuevo</span>
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-slate-200 dark:border-gray-700">
-        <div className="flex items-center gap-4">
-          <Filter className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Filtrar por:</span>
-          <div className="flex gap-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border border-slate-200 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400 flex-shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">Filtrar por:</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
             <FilterButton
               active={filterCategory === 'all'}
               onClick={() => setFilterCategory('all')}
@@ -137,7 +139,7 @@ function ProductsListContent() {
               active={filterCategory === 'promocion'}
               onClick={() => setFilterCategory('promocion')}
             >
-              🔥 Promociones ({activeProducts.filter(p => p.isOnPromotion).length})
+              🔥 Promos ({activeProducts.filter(p => p.isOnPromotion).length})
             </FilterButton>
             <FilterButton
               active={filterCategory === 'helado'}
@@ -155,9 +157,10 @@ function ProductsListContent() {
         </div>
       </div>
 
-      {/* Products Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Products List - Desktop Table / Mobile Cards */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50 dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700">
               <tr>
@@ -201,10 +204,10 @@ function ProductsListContent() {
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                       product.category === 'helado' 
-                        ? 'bg-blue-100 text-blue-700' 
-                        : 'bg-purple-100 text-purple-700'
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' 
+                        : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                     }`}>
-                      {product.category === 'helado' ? '🍦 Helado' : '🍰 Postre'}
+                      {product.category === 'helado' ? 'Helado' : 'Postre'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -243,9 +246,87 @@ function ProductsListContent() {
           </table>
         </div>
 
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-200 dark:divide-gray-700">
+          {filteredProducts.map((product) => (
+            <div key={product.id} className="p-4 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors">
+              <div className="flex gap-3">
+                {product.imageUrl ? (
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-gray-700 flex-shrink-0">
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-gray-700 flex items-center justify-center text-3xl flex-shrink-0">
+                    {product.category === 'helado' ? '🍦' : '🍰'}
+                  </div>
+                )}
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h3 className="font-medium text-slate-900 dark:text-slate-100 line-clamp-2 text-sm">
+                      {product.name}
+                    </h3>
+                    {product.isOnPromotion && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse flex-shrink-0">
+                        🔥
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      product.category === 'helado' 
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' 
+                        : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                    }`}>
+                      {product.category === 'helado' ? '🍦 Helado' : '🍰 Postre'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      {product.isOnPromotion && product.promotionalPrice ? (
+                        <div>
+                          <div className="text-xs text-slate-400 dark:text-slate-500 line-through">
+                            ${product.price.toFixed(2)}
+                          </div>
+                          <div className="text-base font-bold text-red-600 dark:text-red-400">
+                            ${product.promotionalPrice.toFixed(2)}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-base font-bold text-slate-900 dark:text-slate-100">${product.price.toFixed(2)}</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleOpenEditModal(product)}
+                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product)}
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {filteredProducts.length === 0 && (
           <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-            <p>No se encontraron productos</p>
+            <p className="text-sm sm:text-base">No se encontraron productos</p>
           </div>
         )}
       </div>
@@ -359,7 +440,7 @@ function FilterButton({
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
         active
           ? 'bg-blue-600 dark:bg-blue-700 text-white shadow-md'
           : 'bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-gray-600'
