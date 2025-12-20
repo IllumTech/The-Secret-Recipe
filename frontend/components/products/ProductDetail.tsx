@@ -14,6 +14,7 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1);
+  const [inputValue, setInputValue] = useState('1');
   const [showToast, setShowToast] = useState(false);
   const [toastQuantity, setToastQuantity] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -31,8 +32,38 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const incrementQuantity = () => setQuantity(q => q + 1);
-  const decrementQuantity = () => setQuantity(q => Math.max(1, q - 1));
+  const incrementQuantity = () => {
+    const newQty = quantity + 1;
+    setQuantity(newQty);
+    setInputValue(newQty.toString());
+  };
+  
+  const decrementQuantity = () => {
+    const newQty = Math.max(1, quantity - 1);
+    setQuantity(newQty);
+    setInputValue(newQty.toString());
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    if (value === '') return;
+    
+    const numValue = parseInt(value);
+    if (!isNaN(numValue)) {
+      setQuantity(Math.max(1, Math.min(100, numValue)));
+    }
+  };
+
+  const handleInputBlur = () => {
+    if (inputValue === '' || parseInt(inputValue) < 1) {
+      setQuantity(1);
+      setInputValue('1');
+    } else {
+      setInputValue(quantity.toString());
+    }
+  };
 
   return (
     <>
@@ -69,6 +100,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               {categoryEmoji}
             </div>
           )}
+          {/* Category Badge */}
           <div className="absolute top-4 right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md z-10">
             <span className="text-sm font-semibold text-primary-600 dark:text-primary-400 capitalize flex items-center gap-1.5">
               <span>{categoryEmoji}</span>
@@ -78,11 +110,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Promotion Badge */}
           {product.isOnPromotion && (
-            <div className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white px-4 py-2 rounded-full shadow-xl animate-pulse z-10">
-              <span className="text-sm font-bold flex items-center gap-2">
-                <span className="text-xl">🔥</span>
-                <span>¡OFERTA ESPECIAL!</span>
-              </span>
+            <div className="absolute top-4 left-4 right-4 flex justify-start">
+              <div className="bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-xl animate-pulse max-w-[calc(100%-5rem)]">
+                <span className="text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+                  <span className="text-base sm:text-xl">🔥</span>
+                  <span className="truncate">¡OFERTA ESPECIAL!</span>
+                </span>
+              </div>
             </div>
           )}
         </div>
@@ -160,9 +194,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               >
                 −
               </button>
-              <span className="text-xl font-bold w-10 text-center text-primary-600 dark:text-primary-400">
-                {quantity}
-              </span>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={inputValue}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                className="w-16 text-center text-xl font-bold text-primary-600 dark:text-primary-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none py-1"
+              />
               <button
                 onClick={incrementQuantity}
                 className="w-8 h-8 bg-primary-500 dark:bg-primary-600 hover:bg-primary-600 dark:hover:bg-primary-700 rounded-lg font-bold text-lg text-white shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center"
