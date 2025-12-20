@@ -142,6 +142,35 @@ async function createProduct(data: any): Promise<APIGatewayProxyResult> {
       }
     }
 
+    // Validate optional business management fields
+    if (data.productionCost !== undefined) {
+      const cost = parseFloat(data.productionCost);
+      if (isNaN(cost) || cost <= 0) {
+        return errorResponse(400, 'Production cost must be a positive number');
+      }
+    }
+
+    if (data.stockQuantity !== undefined) {
+      const stock = parseInt(data.stockQuantity);
+      if (isNaN(stock) || stock < 0 || !Number.isInteger(parseFloat(data.stockQuantity))) {
+        return errorResponse(400, 'Stock quantity must be a non-negative integer');
+      }
+    }
+
+    if (data.minStockAlert !== undefined) {
+      const alert = parseInt(data.minStockAlert);
+      if (isNaN(alert) || alert <= 0 || !Number.isInteger(parseFloat(data.minStockAlert))) {
+        return errorResponse(400, 'Minimum stock alert must be a positive integer');
+      }
+    }
+
+    if (data.leadTimeHours !== undefined) {
+      const leadTime = parseInt(data.leadTimeHours);
+      if (isNaN(leadTime) || leadTime <= 0 || !Number.isInteger(parseFloat(data.leadTimeHours))) {
+        return errorResponse(400, 'Lead time must be a positive integer');
+      }
+    }
+
     const product: any = {
       id: uuidv4(),
       name: data.name,
@@ -159,6 +188,23 @@ async function createProduct(data: any): Promise<APIGatewayProxyResult> {
     // Only add promotionalPrice if promotion is enabled
     if (data.isOnPromotion && data.promotionalPrice) {
       product.promotionalPrice = parseFloat(data.promotionalPrice);
+    }
+
+    // Add optional business management fields if provided
+    if (data.productionCost !== undefined) {
+      product.productionCost = parseFloat(data.productionCost);
+    }
+
+    if (data.stockQuantity !== undefined) {
+      product.stockQuantity = parseInt(data.stockQuantity);
+    }
+
+    if (data.minStockAlert !== undefined) {
+      product.minStockAlert = parseInt(data.minStockAlert);
+    }
+
+    if (data.leadTimeHours !== undefined) {
+      product.leadTimeHours = parseInt(data.leadTimeHours);
     }
 
     const command = new PutCommand({
@@ -208,6 +254,35 @@ async function updateProduct(id: string, data: any): Promise<APIGatewayProxyResu
       }
     }
 
+    // Validate optional business management fields
+    if (data.productionCost !== undefined) {
+      const cost = parseFloat(data.productionCost);
+      if (isNaN(cost) || cost <= 0) {
+        return errorResponse(400, 'Production cost must be a positive number');
+      }
+    }
+
+    if (data.stockQuantity !== undefined) {
+      const stock = parseInt(data.stockQuantity);
+      if (isNaN(stock) || stock < 0 || !Number.isInteger(parseFloat(data.stockQuantity))) {
+        return errorResponse(400, 'Stock quantity must be a non-negative integer');
+      }
+    }
+
+    if (data.minStockAlert !== undefined) {
+      const alert = parseInt(data.minStockAlert);
+      if (isNaN(alert) || alert <= 0 || !Number.isInteger(parseFloat(data.minStockAlert))) {
+        return errorResponse(400, 'Minimum stock alert must be a positive integer');
+      }
+    }
+
+    if (data.leadTimeHours !== undefined) {
+      const leadTime = parseInt(data.leadTimeHours);
+      if (isNaN(leadTime) || leadTime <= 0 || !Number.isInteger(parseFloat(data.leadTimeHours))) {
+        return errorResponse(400, 'Lead time must be a positive integer');
+      }
+    }
+
     // Build update expression
     const updates: any = {
       updatedAt: new Date().toISOString()
@@ -227,6 +302,23 @@ async function updateProduct(id: string, data: any): Promise<APIGatewayProxyResu
         // When disabling promotion, remove promotional price
         updates.promotionalPrice = null;
       }
+    }
+
+    // Add optional business management fields if provided
+    if (data.productionCost !== undefined) {
+      updates.productionCost = parseFloat(data.productionCost);
+    }
+
+    if (data.stockQuantity !== undefined) {
+      updates.stockQuantity = parseInt(data.stockQuantity);
+    }
+
+    if (data.minStockAlert !== undefined) {
+      updates.minStockAlert = parseInt(data.minStockAlert);
+    }
+
+    if (data.leadTimeHours !== undefined) {
+      updates.leadTimeHours = parseInt(data.leadTimeHours);
     }
 
     const updateExpression = 'SET ' + Object.keys(updates).map((key, index) => `#${key} = :${key}`).join(', ');
