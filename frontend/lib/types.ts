@@ -11,6 +11,11 @@ export interface Product {
   promotionalPrice?: number;
   createdAt: string;
   updatedAt: string;
+  // Business management fields
+  productionCost?: number;
+  stockQuantity?: number;
+  minStockAlert?: number;
+  leadTimeHours?: number;
 }
 
 export interface CartItem {
