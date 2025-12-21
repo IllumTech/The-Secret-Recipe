@@ -9,9 +9,10 @@ import { getDisplayPrice, getDiscountPercentage } from '@/lib/pricing';
 interface ProductCardProps {
   product: Product;
   onProductClick?: (product: Product) => void;
+  isAdminView?: boolean;
 }
 
-export default function ProductCard({ product, onProductClick }: ProductCardProps) {
+export default function ProductCard({ product, onProductClick, isAdminView = false }: ProductCardProps) {
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
   const [isHovered, setIsHovered] = useState(false);
   const { addItem, updateQuantity, removeItem, items } = useCart();
@@ -65,6 +66,30 @@ export default function ProductCard({ product, onProductClick }: ProductCardProp
             {categoryEmoji} {product.category}
           </span>
         </div>
+
+        {/* Stock Status Badges */}
+        {product.stockQuantity !== undefined && (
+          <>
+            {product.stockQuantity === 0 ? (
+              <div className="absolute bottom-3 left-3 bg-red-600 dark:bg-red-700 text-white px-3 py-1 rounded-full shadow-lg">
+                <span className="text-xs font-bold">⚠️ Agotado</span>
+              </div>
+            ) : product.minStockAlert !== undefined && product.stockQuantity <= product.minStockAlert ? (
+              <div className="absolute bottom-3 left-3 bg-orange-500 dark:bg-orange-600 text-white px-3 py-1 rounded-full shadow-lg">
+                <span className="text-xs font-bold">⚠️ Stock Bajo</span>
+              </div>
+            ) : null}
+          </>
+        )}
+
+        {/* Stock Quantity in Admin View */}
+        {isAdminView && product.stockQuantity !== undefined && (
+          <div className="absolute bottom-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-3 py-1 rounded-full">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              📦 Stock: {product.stockQuantity}
+            </span>
+          </div>
+        )}
 
 
 
