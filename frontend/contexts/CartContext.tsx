@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, CartItem } from '@/lib/types';
 import { getDisplayPrice } from '@/lib/pricing';
+import { useProducts } from './ProductContext';
 
 interface CartContextType {
   items: CartItem[];
@@ -12,12 +13,14 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalAmount: number;
+  hasOutOfStockItems: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const { products } = useProducts();
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -31,6 +34,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
+
+  // Sync cart items with latest product data
+  useEffect(() => {
+    if (products.length > 0 && items.length > 0) {
+      setItems((currentItems) =>
+        currentItems.map((item) => {
+          const updatedProduct = products.find((p) => p.id === item.product.id);
+          // If product found, update it with latest data, otherwise keep current
+          return updatedProduct
+            ? { ...item, product: updatedProduct }
+            : item;
+        })
+      );
+    }
+  }, [products]);
 
   const addItem = (product: Product, quantity: number = 1) => {
     setItems((currentItems) => {
@@ -70,7 +88,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalAmount = items.reduce((sum, item) => sum + getDisplayPrice(item.product) * item.quantity, 0);
+  
+  // Only count items that have stock available
+  const totalAmount = items.reduce((sum, item) => {
+    const hasStock = item.product.stockQuantity === undefined || item.product.stockQuantity > 0;
+    return hasStock ? sum + getDisplayPrice(item.product) * item.quantity : sum;
+  }, 0);
+  
+  // Check if any item is out of stock
+  const hasOutOfStockItems = items.some(item => 
+    item.product.stockQuantity !== undefined && item.product.stockQuantity === 0
+  );
 
   return (
     <CartContext.Provider
@@ -82,6 +110,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         totalItems,
         totalAmount,
+        hasOutOfStockItems,
       }}
     >
       {children}

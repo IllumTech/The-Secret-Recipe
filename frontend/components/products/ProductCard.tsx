@@ -20,10 +20,15 @@ export default function ProductCard({ product, onProductClick, isAdminView = fal
   // Get current quantity in cart
   const cartItem = items.find(item => item.product.id === product.id);
   const cartQuantity = cartItem?.quantity || 0;
+  
+  // Check if product is out of stock
+  const isOutOfStock = product.stockQuantity !== undefined && product.stockQuantity === 0;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // Prevent adding if out of stock
+    if (isOutOfStock) return;
     addItem(product, 1);
   };
 
@@ -104,15 +109,20 @@ export default function ProductCard({ product, onProductClick, isAdminView = fal
             <div className="relative">
               <button
                 onClick={handleAdd}
-                className="w-10 h-10 bg-white dark:bg-gray-700 hover:bg-primary-500 dark:hover:bg-primary-600 text-primary-600 dark:text-primary-400 hover:text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-100 ease-out flex items-center justify-center font-bold text-xl transform hover:scale-110 active:scale-95"
+                disabled={isOutOfStock}
+                className={`w-10 h-10 rounded-full shadow-lg transition-all duration-100 ease-out flex items-center justify-center font-bold text-xl ${
+                  isOutOfStock
+                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    : 'bg-white dark:bg-gray-700 hover:bg-primary-500 dark:hover:bg-primary-600 text-primary-600 dark:text-primary-400 hover:text-white hover:shadow-xl transform hover:scale-110 active:scale-95'
+                }`}
               >
                 +
               </button>
               
-              {/* Tooltip "Agregar" en hover */}
+              {/* Tooltip */}
               {isHovered && (
                 <div className="absolute top-12 right-0 bg-gray-900 dark:bg-gray-700 text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap animate-fade-in">
-                  Agregar
+                  {isOutOfStock ? 'Sin stock' : 'Agregar'}
                   <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 dark:bg-gray-700 transform rotate-45"></div>
                 </div>
               )}
@@ -138,8 +148,13 @@ export default function ProductCard({ product, onProductClick, isAdminView = fal
               
               <button
                 onClick={handleAdd}
-                className="w-8 h-8 bg-white dark:bg-gray-700 hover:bg-primary-500 dark:hover:bg-primary-600 hover:shadow-lg text-primary-600 dark:text-primary-400 hover:text-white rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg transform hover:scale-125 active:scale-95"
-                title="Agregar más"
+                disabled={isOutOfStock}
+                className={`w-8 h-8 rounded-full transition-all duration-100 ease-out flex items-center justify-center font-bold text-lg ${
+                  isOutOfStock
+                    ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    : 'bg-white dark:bg-gray-700 hover:bg-primary-500 dark:hover:bg-primary-600 hover:shadow-lg text-primary-600 dark:text-primary-400 hover:text-white transform hover:scale-125 active:scale-95'
+                }`}
+                title={isOutOfStock ? 'Sin stock' : 'Agregar más'}
               >
                 +
               </button>

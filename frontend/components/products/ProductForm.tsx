@@ -43,8 +43,31 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+    
+    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    // Real-time validation for business management fields
+    if (value !== '' && value !== undefined) {
+      const numValue = Number(value);
+      
+      if (name === 'productionCost' && (isNaN(numValue) || numValue <= 0)) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número positivo' }));
+      }
+      
+      if (name === 'stockQuantity' && (isNaN(numValue) || numValue < 0 || !Number.isInteger(numValue))) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número entero no negativo' }));
+      }
+      
+      if (name === 'minStockAlert' && (isNaN(numValue) || numValue <= 0 || !Number.isInteger(numValue))) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número entero positivo' }));
+      }
+      
+      if (name === 'leadTimeHours' && (isNaN(numValue) || numValue <= 0 || !Number.isInteger(numValue))) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número entero positivo' }));
+      }
     }
   };
 
@@ -63,21 +86,33 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       }
     }
     
-    // Business management fields validation
-    if (formData.productionCost && Number(formData.productionCost) <= 0) {
-      newErrors.productionCost = 'Debe ser un número positivo';
+    // Business management fields validation - only validate if field has a value
+    if (formData.productionCost !== '' && formData.productionCost !== undefined) {
+      const cost = Number(formData.productionCost);
+      if (isNaN(cost) || cost <= 0) {
+        newErrors.productionCost = 'Debe ser un número positivo';
+      }
     }
     
-    if (formData.stockQuantity && Number(formData.stockQuantity) < 0) {
-      newErrors.stockQuantity = 'No puede ser negativo';
+    if (formData.stockQuantity !== '' && formData.stockQuantity !== undefined) {
+      const stock = Number(formData.stockQuantity);
+      if (isNaN(stock) || stock < 0 || !Number.isInteger(stock)) {
+        newErrors.stockQuantity = 'Debe ser un número entero no negativo';
+      }
     }
     
-    if (formData.minStockAlert && Number(formData.minStockAlert) <= 0) {
-      newErrors.minStockAlert = 'Debe ser un número positivo';
+    if (formData.minStockAlert !== '' && formData.minStockAlert !== undefined) {
+      const alert = Number(formData.minStockAlert);
+      if (isNaN(alert) || alert <= 0 || !Number.isInteger(alert)) {
+        newErrors.minStockAlert = 'Debe ser un número entero positivo';
+      }
     }
     
-    if (formData.leadTimeHours && Number(formData.leadTimeHours) <= 0) {
-      newErrors.leadTimeHours = 'Debe ser un número positivo';
+    if (formData.leadTimeHours !== '' && formData.leadTimeHours !== undefined) {
+      const leadTime = Number(formData.leadTimeHours);
+      if (isNaN(leadTime) || leadTime <= 0 || !Number.isInteger(leadTime)) {
+        newErrors.leadTimeHours = 'Debe ser un número entero positivo';
+      }
     }
     
     setErrors(newErrors);
@@ -88,17 +123,30 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
     e.preventDefault();
     if (validate()) {
       // Prepare data for submission
-      const submitData = {
+      const submitData: any = {
         ...formData,
         price: Number(formData.price),
         // Only include promotionalPrice if promotion is enabled
         promotionalPrice: formData.isOnPromotion && formData.promotionalPrice ? Number(formData.promotionalPrice) : undefined,
-        // Business management fields - only include if provided
-        productionCost: formData.productionCost ? Number(formData.productionCost) : undefined,
-        stockQuantity: formData.stockQuantity ? Number(formData.stockQuantity) : undefined,
-        minStockAlert: formData.minStockAlert ? Number(formData.minStockAlert) : undefined,
-        leadTimeHours: formData.leadTimeHours ? Number(formData.leadTimeHours) : undefined,
       };
+
+      // Business management fields - only include if provided (not empty string)
+      if (formData.productionCost !== '' && formData.productionCost !== undefined) {
+        submitData.productionCost = Number(formData.productionCost);
+      }
+      
+      if (formData.stockQuantity !== '' && formData.stockQuantity !== undefined) {
+        submitData.stockQuantity = Number(formData.stockQuantity);
+      }
+      
+      if (formData.minStockAlert !== '' && formData.minStockAlert !== undefined) {
+        submitData.minStockAlert = Number(formData.minStockAlert);
+      }
+      
+      if (formData.leadTimeHours !== '' && formData.leadTimeHours !== undefined) {
+        submitData.leadTimeHours = Number(formData.leadTimeHours);
+      }
+
       onSubmit(submitData);
     }
   };

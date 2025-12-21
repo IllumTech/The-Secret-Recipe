@@ -12,7 +12,7 @@ interface CartModalProps {
 }
 
 export default function CartModal({ isOpen, onClose }: CartModalProps) {
-  const { items, totalAmount } = useCart();
+  const { items, totalAmount, hasOutOfStockItems } = useCart();
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -117,13 +117,25 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
               </div>
               
               <div className="space-y-2 sm:space-y-3">
-                <Link
-                  href="/checkout"
-                  onClick={onClose}
-                  className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 text-white py-3 sm:py-4 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl text-center"
-                >
-                  Proceder al Pago 💳
-                </Link>
+                {hasOutOfStockItems ? (
+                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
+                      <span>⚠️</span>
+                      <span className="text-sm font-semibold">Hay productos sin stock en tu carrito</span>
+                    </div>
+                    <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+                      Elimina los productos sin stock para continuar con tu compra.
+                    </p>
+                  </div>
+                ) : (
+                  <Link
+                    href="/checkout"
+                    onClick={onClose}
+                    className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 text-white py-3 sm:py-4 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl text-center"
+                  >
+                    Proceder al Pago 💳
+                  </Link>
+                )}
                 
                 <Link
                   href="/carrito"
