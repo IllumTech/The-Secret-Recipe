@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Package, ShoppingCart, LayoutDashboard, Menu, X } from 'lucide-react';
+import { ShoppingBag, Package, ShoppingCart, LayoutDashboard, Menu, X, TrendingUp } from 'lucide-react';
 
 export default function AdminLayout({
   children,
@@ -65,6 +65,9 @@ export default function AdminLayout({
             <NavLink href="/admin/pedidos" icon={<ShoppingCart className="w-5 h-5" />} active={pathname.startsWith('/admin/pedidos')}>
               Pedidos
             </NavLink>
+            <NavLink href="/admin/rentabilidad" icon={<TrendingUp className="w-5 h-5" />} active={pathname.startsWith('/admin/rentabilidad')}>
+              Rentabilidad
+            </NavLink>
           </div>
         </div>
       </nav>
@@ -97,6 +100,14 @@ export default function AdminLayout({
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pedidos
+              </MobileNavLink>
+              <MobileNavLink 
+                href="/admin/rentabilidad" 
+                icon={<TrendingUp className="w-5 h-5" />}
+                active={pathname.startsWith('/admin/rentabilidad')}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Rentabilidad
               </MobileNavLink>
               <Link 
                 href="/" 
