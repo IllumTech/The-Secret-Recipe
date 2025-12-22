@@ -11,6 +11,7 @@ Globals:
       Variables:
         PRODUCTS_TABLE: !Ref ProductsTable
         ORDERS_TABLE: !Ref OrdersTable
+        WASTE_TABLE: !Ref WasteTable
         IMAGES_BUCKET: !Ref ImagesBucket
   Api:
     Cors:
@@ -52,6 +53,31 @@ Resources:
       KeySchema:
         - AttributeName: id
           KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  WasteTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TheSecretRecipe-Waste
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: productId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: productId-timestamp-index
+          KeySchema:
+            - AttributeName: productId
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
 
   # S3 Bucket for Images
@@ -223,6 +249,45 @@ Resources:
         - S3CrudPolicy:
             BucketName: !Ref ImagesBucket
 
+  WasteManagementFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/waste-management/
+      Handler: index.handler
+      Timeout: 30
+      Events:
+        CreateWaste:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /waste
+            Method: POST
+        ListWaste:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /waste
+            Method: GET
+        GetWasteReport:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /waste/report
+            Method: GET
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WasteTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
@@ -233,6 +298,9 @@ Outputs:
   OrdersTableName:
     Description: DynamoDB Orders Table Name
     Value: !Ref OrdersTable
+  WasteTableName:
+    Description: DynamoDB Waste Table Name
+    Value: !Ref WasteTable
   ImagesBucketName:
     Description: S3 Images Bucket Name
     Value: !Ref ImagesBucket
