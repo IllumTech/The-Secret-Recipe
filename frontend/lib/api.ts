@@ -124,3 +124,42 @@ export async function uploadImage(file: File): Promise<{ imageUrl: string }> {
     reader.readAsDataURL(file);
   });
 }
+
+// Waste Management API
+export async function createWasteEntry(data: {
+  productId: string;
+  quantity: number;
+  reason: 'expired' | 'damaged' | 'other';
+  notes?: string;
+  timestamp: string;
+}): Promise<import('./types').WasteEntry> {
+  return apiCall<import('./types').WasteEntry>('/waste', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getWasteEntries(params?: {
+  startDate?: string;
+  endDate?: string;
+}): Promise<import('./types').WasteEntry[]> {
+  const queryString = params 
+    ? '?' + new URLSearchParams(params as Record<string, string>).toString()
+    : '';
+  return apiCall<import('./types').WasteEntry[]>(`/waste${queryString}`);
+}
+
+export async function getWasteReport(params?: {
+  month?: number;
+  year?: number;
+}): Promise<import('./types').WasteReport> {
+  const queryString = params 
+    ? '?' + new URLSearchParams(
+        Object.entries(params).reduce((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {} as Record<string, string>)
+      ).toString()
+    : '';
+  return apiCall<import('./types').WasteReport>(`/waste/report${queryString}`);
+}

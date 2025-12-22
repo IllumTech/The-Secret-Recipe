@@ -42,3 +42,32 @@ export interface Order {
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   createdAt: string;
 }
+
+export interface WasteEntry {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  reason: 'expired' | 'damaged' | 'other';
+  notes?: string;
+  productionCost: number;
+  financialImpact: number;
+  timestamp: string;
+  recordedBy?: string;
+}
+
+export interface WasteReport {
+  month: number;
+  year: number;
+  totalWasteCost: number;
+  wasteEntryCount: number;
+  wasteByProduct: Array<{
+    productId: string;
+    productName: string;
+    totalQuantity: number;
+    totalCost: number;
+    entries: WasteEntry[];
+  }>;
+  startDate: string;
+  endDate: string;
+}
