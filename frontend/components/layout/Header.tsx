@@ -2,17 +2,26 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import CartButton from '@/components/cart/CartButton';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleCategoryClick = (category: string) => {
     // Cerrar menú móvil
     setMobileMenuOpen(false);
     
-    // Disparar evento personalizado para cambiar categoría
+    // Si no estamos en el home, navegar al home con el hash
+    if (pathname !== '/') {
+      router.push(`/#productos-${category}`);
+      return;
+    }
+    
+    // Si estamos en el home, disparar evento y hacer scroll
     window.dispatchEvent(new CustomEvent('categoryChange', { detail: category }));
     
     // Scroll a productos
@@ -26,6 +35,14 @@ export default function Header() {
 
   const handleScrollToSection = (sectionId: string) => {
     setMobileMenuOpen(false);
+    
+    // Si no estamos en el home, navegar al home con el hash
+    if (pathname !== '/') {
+      router.push(`/#${sectionId}`);
+      return;
+    }
+    
+    // Si estamos en el home, hacer scroll directo
     const element = document.getElementById(sectionId);
     if (element) {
       const offset = 100;

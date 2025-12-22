@@ -27,6 +27,42 @@ export default function HomePage() {
     };
   }, []);
 
+  // Manejar navegación con hash desde otras páginas
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      // Extraer la categoría del hash (ej: #productos-helado)
+      if (hash.startsWith('#productos-')) {
+        const category = hash.replace('#productos-', '');
+        setSelectedCategory(category);
+        
+        // Hacer scroll a la sección de productos después de un pequeño delay
+        setTimeout(() => {
+          const element = document.getElementById('productos');
+          if (element) {
+            const offset = 100;
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+          }
+        }, 100);
+      } else {
+        // Para otros hashes (como #nosotros)
+        const sectionId = hash.replace('#', '');
+        setTimeout(() => {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            const offset = 100;
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+          }
+        }, 100);
+      }
+      
+      // Limpiar el hash de la URL
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
+
   const activeProducts = products.filter(p => p.isActive);
   const filteredProducts = selectedCategory === 'promocion'
     ? activeProducts.filter(p => p.isOnPromotion)
