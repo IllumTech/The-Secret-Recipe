@@ -217,7 +217,7 @@ describe('Orders Lambda Function', () => {
       expect(result.statusCode).toBe(201);
     });
 
-    it('should use default 48 hours when leadTimeHours is not defined', async () => {
+    it('should use default 24 hours when leadTimeHours is not defined', async () => {
       const mockProduct = {
         id: 'prod-1',
         name: 'Test Product',
@@ -232,8 +232,8 @@ describe('Orders Lambda Function', () => {
 
       ddbMock.on(GetCommand).resolves({ Item: mockProduct });
 
-      // Delivery date is only 24 hours from now (less than default 48 hours)
-      const deliveryDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      // Delivery date is only 12 hours from now (less than default 24 hours)
+      const deliveryDate = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
 
       const event: Partial<APIGatewayProxyEvent> = {
         httpMethod: 'POST',
@@ -259,7 +259,7 @@ describe('Orders Lambda Function', () => {
 
       expect(result.statusCode).toBe(400);
       const body = JSON.parse(result.body);
-      expect(body.error).toContain('requires at least 48 hours notice');
+      expect(body.error).toContain('requires at least 24 hours notice');
     });
   });
 

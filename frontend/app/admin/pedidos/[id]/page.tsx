@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Order } from '@/lib/types';
+import { Order, Product } from '@/lib/types';
 import * as api from '@/lib/api';
 import Link from 'next/link';
 import { ArrowLeft, Package, User, MapPin, Calendar, DollarSign } from 'lucide-react';
@@ -16,15 +16,34 @@ export default function AdminOrderDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchOrder() {
+    async function fetchData() {
       try {
         setLoading(true);
-        const orders = await api.getOrders();
+        // Fetch both orders and products
+        const [orders, productsData] = await Promise.all([
+          api.getOrders(),
+          api.getProducts()
+        ]);
+        
         const foundOrder = orders.find(o => o.id === orderId);
         if (!foundOrder) {
           setError('Pedido no encontrado');
         } else {
-          setOrder(foundOrder);
+          // Enrich order items with current product data (including imageUrl)
+          const enrichedOrder = {
+            ...foundOrder,
+            items: foundOrder.items.map(item => {
+              const currentProduct = productsData.find(p => p.id === item.product.id);
+              return {
+                ...item,
+                product: {
+                  ...item.product,
+                  imageUrl: currentProduct?.imageUrl || item.product.imageUrl
+                }
+              };
+            })
+          };
+          setOrder(enrichedOrder);
         }
       } catch (err) {
         console.error('Error fetching order:', err);
@@ -35,7 +54,7 @@ export default function AdminOrderDetailPage() {
     }
 
     if (orderId) {
-      fetchOrder();
+      fetchData();
     }
   }, [orderId]);
 
@@ -185,8 +204,18 @@ export default function AdminOrderDetailPage() {
           {order.items.map((item, index) => (
             <div key={index} className="flex items-center justify-between py-4 px-4 bg-slate-50 dark:bg-gray-700/50 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors">
               <div className="flex items-center flex-1">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg flex items-center justify-center text-3xl mr-4">
-                  {item.product.image || '🍦'}
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg overflow-hidden mr-4">
+                  {item.product.imageUrl ? (
+                    <img 
+                      src={item.product.imageUrl} 
+                      alt={item.product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-3xl">
+                      {item.product.image || '🍦'}
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-slate-900 dark:text-white">{item.product.name}</h4>

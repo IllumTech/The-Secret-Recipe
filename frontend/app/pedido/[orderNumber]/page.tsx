@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Order } from '@/lib/types';
+import { Order, Product } from '@/lib/types';
 import * as api from '@/lib/api';
 import Link from 'next/link';
 
@@ -13,13 +13,35 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    async function fetchOrder() {
+    async function fetchData() {
       try {
         setLoading(true);
-        const orderData = await api.getOrderByNumber(orderNumber);
-        setOrder(orderData);
+        // Fetch both order and products
+        const [orderData, productsData] = await Promise.all([
+          api.getOrderByNumber(orderNumber),
+          api.getProducts()
+        ]);
+        
+        // Enrich order items with current product data (including imageUrl)
+        const enrichedOrder = {
+          ...orderData,
+          items: orderData.items.map(item => {
+            const currentProduct = productsData.find(p => p.id === item.product.id);
+            return {
+              ...item,
+              product: {
+                ...item.product,
+                imageUrl: currentProduct?.imageUrl || item.product.imageUrl
+              }
+            };
+          })
+        };
+        
+        setOrder(enrichedOrder);
+        setProducts(productsData);
       } catch (err) {
         console.error('Error fetching order:', err);
         setError('No se pudo cargar el pedido');
@@ -29,7 +51,7 @@ export default function OrderDetailPage() {
     }
 
     if (orderNumber) {
-      fetchOrder();
+      fetchData();
     }
   }, [orderNumber]);
 
@@ -168,8 +190,18 @@ export default function OrderDetailPage() {
             {order.items.map((item, index) => (
               <div key={index} className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
                 <div className="flex items-center flex-1">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex items-center justify-center text-3xl mr-4">
-                    {item.product.image || '🍦'}
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg overflow-hidden mr-4">
+                    {item.product.imageUrl ? (
+                      <img 
+                        src={item.product.imageUrl} 
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-3xl">
+                        {item.product.image || '🍦'}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-800 dark:text-white">{item.product.name}</h4>

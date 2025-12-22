@@ -355,7 +355,7 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
               step="1"
               value={formData.leadTimeHours}
               onChange={handleChange}
-              placeholder="48"
+              placeholder="24"
               disabled={isLoading}
               className="h-11"
             />

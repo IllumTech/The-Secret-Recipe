@@ -14,7 +14,12 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(error.error || `HTTP error! status: ${response.status}`);
+    const apiError: any = new Error(error.error || `HTTP error! status: ${response.status}`);
+    apiError.response = {
+      status: response.status,
+      data: error
+    };
+    throw apiError;
   }
 
   return response.json();
@@ -80,6 +85,9 @@ export async function createOrder(data: {
     quantity: number;
     image?: string;
   }>;
+  deliveryDate?: string;
+  deliveryTime?: string;
+  productionNotes?: string;
 }): Promise<Order> {
   return apiCall<Order>('/orders', {
     method: 'POST',

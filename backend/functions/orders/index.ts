@@ -128,7 +128,7 @@ async function createOrder(data: any): Promise<APIGatewayProxyResult> {
 
       // Validate lead time if deliveryDate is provided
       if (data.deliveryDate) {
-        const leadTimeHours = product.leadTimeHours || 48; // Default 48 hours
+        const leadTimeHours = product.leadTimeHours || 24; // Default 24 hours
         const deliveryDate = new Date(data.deliveryDate);
         const now = new Date();
         const hoursDifference = (deliveryDate.getTime() - now.getTime()) / (1000 * 60 * 60);
@@ -178,6 +178,7 @@ async function createOrder(data: any): Promise<APIGatewayProxyResult> {
             name: product.name,
             price: price,
             image: product.image || '🍦',
+            imageUrl: product.imageUrl,
             category: product.category || 'helado',
             isActive: product.isActive,
             isOnPromotion: product.isOnPromotion || false,

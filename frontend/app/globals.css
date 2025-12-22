@@ -86,3 +86,63 @@
     animation: fade-in-down 0.3s ease-out;
   }
 }
+
+/* React DatePicker Custom Styles */
+.react-datepicker {
+  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 shadow-xl rounded-lg;
+}
+
+.react-datepicker__header {
+  @apply bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-700 dark:to-pink-700 border-b-0 rounded-t-lg;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  @apply text-white font-semibold;
+}
+
+/* Contenedor de los días - fondo claro */
+.react-datepicker__month {
+  @apply bg-white dark:bg-gray-800;
+}
+
+.react-datepicker__week {
+  @apply bg-white dark:bg-gray-800;
+}
+
+/* Días disponibles - destacados y en negrilla con buen contraste */
+.react-datepicker__day {
+  @apply text-gray-900 dark:text-white font-bold rounded-lg transition-colors;
+}
+
+/* Hover en días disponibles - fondo morado claro con texto oscuro visible */
+.react-datepicker__day:hover:not(.react-datepicker__day--disabled):not(.react-datepicker__day--selected) {
+  @apply bg-purple-100 dark:bg-purple-900/50 text-gray-900 dark:text-white;
+}
+
+/* Día seleccionado */
+.react-datepicker__day--selected {
+  @apply bg-purple-600 dark:bg-purple-500 text-white font-bold hover:bg-purple-700 dark:hover:bg-purple-600;
+}
+
+.react-datepicker__day--keyboard-selected {
+  @apply bg-purple-500 dark:bg-purple-600 text-white font-bold;
+}
+
+/* Días NO disponibles - muy opacos y sin negrilla */
+.react-datepicker__day--disabled {
+  @apply text-gray-400 dark:text-gray-600 font-normal opacity-30 cursor-not-allowed hover:bg-transparent;
+}
+
+/* Día de hoy - con borde para destacar */
+.react-datepicker__day--today {
+  @apply font-bold border-2 border-purple-600 dark:border-purple-400;
+}
+
+.react-datepicker__navigation-icon::before {
+  @apply border-white;
+}
+
+.react-datepicker__navigation:hover *::before {
+  @apply border-gray-200;
+}
