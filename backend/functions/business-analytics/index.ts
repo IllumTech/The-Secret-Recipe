@@ -189,9 +189,23 @@ async function getDemandForecast(): Promise<APIGatewayProxyResult> {
     const orderDataByProduct: Record<string, any> = {};
     
     recentOrders.forEach(order => {
+      if (!order.items || !Array.isArray(order.items)) {
+        console.warn(`Order ${order.id} has invalid items structure`);
+        return;
+      }
+
       order.items.forEach(item => {
-        const productId = item.product.id;
-        const productName = item.product.name;
+        // Handle both old and new order structures
+        const product = item.product || item;
+        
+        if (!product || !product.id || !product.name) {
+          console.warn(`Invalid product data in order ${order.id}:`, item);
+          return;
+        }
+
+        const productId = product.id;
+        const productName = product.name;
+        const quantity = item.quantity || 1;
         const orderDate = order.createdAt.split('T')[0]; // Get date part only
 
         if (!orderDataByProduct[productId]) {
@@ -206,7 +220,7 @@ async function getDemandForecast(): Promise<APIGatewayProxyResult> {
           orderDataByProduct[productId].ordersByDate[orderDate] = 0;
         }
 
-        orderDataByProduct[productId].ordersByDate[orderDate] += item.quantity;
+        orderDataByProduct[productId].ordersByDate[orderDate] += quantity;
       });
     });
 
@@ -221,20 +235,20 @@ async function getDemandForecast(): Promise<APIGatewayProxyResult> {
     }));
 
     // Prepare Bedrock prompt
-    const prompt = `You are a business analyst for a bakery. Analyze the following order history from the last 30 days and predict the demand for each product for the next 7 days.
+    const prompt = `Eres un analista de negocios para una panadería. Analiza el siguiente historial de pedidos de los últimos 30 días y predice la demanda de cada producto para los próximos 7 días.
 
-Order History:
+Historial de Pedidos:
 ${JSON.stringify(orderHistory, null, 2)}
 
-Provide your forecast in JSON format:
+Proporciona tu pronóstico en formato JSON:
 {
   "forecast": [
-    {"product": "Product Name", "day": "2024-01-15", "quantity": 10},
+    {"product": "Nombre del Producto", "day": "2024-01-15", "quantity": 10},
     ...
   ]
 }
 
-Only return the JSON object, no additional text.`;
+Solo devuelve el objeto JSON, sin texto adicional.`;
 
     // Invoke Bedrock with Claude 3 Sonnet
     const modelId = 'anthropic.claude-3-sonnet-20240229-v1:0';
@@ -332,27 +346,29 @@ async function getPriceRecommendations(): Promise<APIGatewayProxyResult> {
     });
 
     // Prepare Bedrock prompt
-    const prompt = `You are a pricing consultant for a bakery. Review the following product data including current prices, production costs, and contribution margins.
+    const prompt = `Eres un consultor de precios para una panadería. Revisa los siguientes datos de productos incluyendo precios actuales, costos de producción y márgenes de contribución.
 
-Product Data:
+Datos de Productos:
 ${JSON.stringify(productData, null, 2)}
 
-Recommend price adjustments to maintain healthy margins (target: 40-60%). For products already in the healthy range, recommend maintaining the current price.
+Recomienda ajustes de precios para mantener márgenes saludables (objetivo: 40-60%). Para productos que ya están en el rango saludable, recomienda mantener el precio actual.
 
-Provide recommendations in JSON format:
+IMPORTANTE: Todas las justificaciones deben estar en español.
+
+Proporciona las recomendaciones en formato JSON:
 {
   "recommendations": [
     {
-      "product": "Product Name",
+      "product": "Nombre del Producto",
       "currentPrice": 100,
       "suggestedPrice": 110,
-      "reason": "Production costs increased, margin dropped to 25%"
+      "reason": "Los costos de producción aumentaron, el margen bajó a 25%"
     },
     ...
   ]
 }
 
-Only return the JSON object, no additional text.`;
+Solo devuelve el objeto JSON, sin texto adicional. Recuerda: todas las justificaciones (reason) deben estar en español.`;
 
     // Invoke Bedrock with Claude 3 Sonnet
     const modelId = 'anthropic.claude-3-sonnet-20240229-v1:0';
