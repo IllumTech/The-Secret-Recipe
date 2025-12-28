@@ -41,6 +41,9 @@ export interface Order {
   totalAmount: number;
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   createdAt: string;
+  deliveryDate?: string;
+  deliveryTime?: string;
+  productionNotes?: string;
 }
 
 export interface WasteEntry {
@@ -70,4 +73,21 @@ export interface WasteReport {
   }>;
   startDate: string;
   endDate: string;
+}
+
+export interface CalendarOrder {
+  date: string;
+  orderCount: number;
+  orders: Order[];
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  resource: {
+    orderCount: number;
+    orders: Order[];
+  };
 }

@@ -171,3 +171,27 @@ export async function getWasteReport(params?: {
     : '';
   return apiCall<import('./types').WasteReport>(`/waste/report${queryString}`);
 }
+
+// Production Calendar API
+export async function getCalendarOrders(params?: {
+  startDate?: string;
+  endDate?: string;
+}): Promise<{
+  dates: string[];
+  ordersByDate: { [date: string]: Order[] };
+  orderCounts: { [date: string]: number };
+  totalOrders: number;
+}> {
+  const queryString = params 
+    ? '?' + new URLSearchParams(params as Record<string, string>).toString()
+    : '';
+  return apiCall(`/calendar/orders${queryString}`);
+}
+
+export async function getOrdersByDate(date: string): Promise<{
+  date: string;
+  orders: Order[];
+  count: number;
+}> {
+  return apiCall(`/calendar/orders/${date}`);
+}

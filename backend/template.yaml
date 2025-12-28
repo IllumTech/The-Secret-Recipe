@@ -50,9 +50,18 @@ Resources:
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
+        - AttributeName: deliveryDate
+          AttributeType: S
       KeySchema:
         - AttributeName: id
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: deliveryDate-index
+          KeySchema:
+            - AttributeName: deliveryDate
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
 
   WasteTable:
@@ -289,6 +298,43 @@ Resources:
             TableName: !Ref WasteTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ProductsTable
+
+  ProductionCalendarFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/production-calendar/
+      Handler: index.handler
+      Timeout: 30
+      Events:
+        GetCalendarOrders:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /calendar/orders
+            Method: GET
+        GetOrdersByDate:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /calendar/orders/{date}
+            Method: GET
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource:
+                - !Sub '${OrdersTable.Arn}/index/*'
 
 Outputs:
   ApiUrl:
