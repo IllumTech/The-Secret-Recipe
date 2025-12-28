@@ -12,6 +12,18 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
   }
+
+  /* Ocultar spinners de inputs numéricos */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
 }
 
 @layer components {
@@ -73,4 +85,134 @@
   .animate-fade-in-down {
     animation: fade-in-down 0.3s ease-out;
   }
+}
+
+/* React DatePicker Custom Styles */
+.react-datepicker {
+  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 shadow-xl rounded-lg;
+}
+
+.react-datepicker__header {
+  @apply bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-700 dark:to-pink-700 border-b-0 rounded-t-lg;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  @apply text-white font-semibold;
+}
+
+/* Contenedor de los días - fondo claro */
+.react-datepicker__month {
+  @apply bg-white dark:bg-gray-800;
+}
+
+.react-datepicker__week {
+  @apply bg-white dark:bg-gray-800;
+}
+
+/* Días disponibles - destacados y en negrilla con buen contraste */
+.react-datepicker__day {
+  @apply text-gray-900 dark:text-white font-bold rounded-lg transition-colors;
+}
+
+/* Hover en días disponibles - fondo morado claro con texto oscuro visible */
+.react-datepicker__day:hover:not(.react-datepicker__day--disabled):not(.react-datepicker__day--selected) {
+  @apply bg-purple-100 dark:bg-purple-900/50 text-gray-900 dark:text-white;
+}
+
+/* Día seleccionado */
+.react-datepicker__day--selected {
+  @apply bg-purple-600 dark:bg-purple-500 text-white font-bold hover:bg-purple-700 dark:hover:bg-purple-600;
+}
+
+.react-datepicker__day--keyboard-selected {
+  @apply bg-purple-500 dark:bg-purple-600 text-white font-bold;
+}
+
+/* Días NO disponibles - muy opacos y sin negrilla */
+.react-datepicker__day--disabled {
+  @apply text-gray-400 dark:text-gray-600 font-normal opacity-30 cursor-not-allowed hover:bg-transparent;
+}
+
+/* Día de hoy - con borde para destacar */
+.react-datepicker__day--today {
+  @apply font-bold border-2 border-purple-600 dark:border-purple-400;
+}
+
+.react-datepicker__navigation-icon::before {
+  @apply border-white;
+}
+
+.react-datepicker__navigation:hover *::before {
+  @apply border-gray-200;
+}
+
+/* React Big Calendar Custom Styles */
+.calendar-container .rbc-calendar {
+  @apply bg-white dark:bg-gray-800;
+}
+
+.calendar-container .rbc-header {
+  @apply bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 py-3 font-semibold text-gray-700 dark:text-gray-200;
+}
+
+.calendar-container .rbc-today {
+  @apply bg-pink-50 dark:bg-pink-900/20;
+}
+
+.calendar-container .rbc-off-range-bg {
+  @apply bg-gray-50 dark:bg-gray-900;
+}
+
+.calendar-container .rbc-date-cell {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.calendar-container .rbc-off-range {
+  @apply text-gray-400 dark:text-gray-600;
+}
+
+.calendar-container .rbc-month-view {
+  @apply border-gray-200 dark:border-gray-700;
+}
+
+.calendar-container .rbc-day-bg {
+  @apply border-gray-200 dark:border-gray-700;
+}
+
+.calendar-container .rbc-month-row {
+  @apply border-gray-200 dark:border-gray-700;
+}
+
+.calendar-container .rbc-header + .rbc-header {
+  @apply border-l border-gray-200 dark:border-gray-700;
+}
+
+.calendar-container .rbc-event {
+  @apply text-white font-medium;
+}
+
+.calendar-container .rbc-event:focus {
+  @apply outline-none ring-2 ring-pink-500 ring-offset-2;
+}
+
+.calendar-container .rbc-show-more {
+  @apply text-pink-600 dark:text-pink-400 font-medium hover:underline;
+}
+
+.calendar-container .rbc-toolbar {
+  @apply mb-4 flex flex-wrap gap-2 items-center justify-between;
+}
+
+.calendar-container .rbc-toolbar button {
+  @apply px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600;
+}
+
+.calendar-container .rbc-toolbar button:active,
+.calendar-container .rbc-toolbar button.rbc-active {
+  @apply bg-pink-600 text-white border-pink-600 dark:bg-pink-500 dark:border-pink-500;
+}
+
+.calendar-container .rbc-toolbar-label {
+  @apply text-xl font-bold text-gray-900 dark:text-white;
 }

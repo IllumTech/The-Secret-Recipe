@@ -11,6 +11,11 @@ export interface Product {
   promotionalPrice?: number;
   createdAt: string;
   updatedAt: string;
+  // Business management fields
+  productionCost?: number;
+  stockQuantity?: number;
+  minStockAlert?: number;
+  leadTimeHours?: number;
 }
 
 export interface CartItem {
@@ -36,4 +41,53 @@ export interface Order {
   totalAmount: number;
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   createdAt: string;
+  deliveryDate?: string;
+  deliveryTime?: string;
+  productionNotes?: string;
+}
+
+export interface WasteEntry {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  reason: 'expired' | 'damaged' | 'other';
+  notes?: string;
+  productionCost: number;
+  financialImpact: number;
+  timestamp: string;
+  recordedBy?: string;
+}
+
+export interface WasteReport {
+  month: number;
+  year: number;
+  totalWasteCost: number;
+  wasteEntryCount: number;
+  wasteByProduct: Array<{
+    productId: string;
+    productName: string;
+    totalQuantity: number;
+    totalCost: number;
+    entries: WasteEntry[];
+  }>;
+  startDate: string;
+  endDate: string;
+}
+
+export interface CalendarOrder {
+  date: string;
+  orderCount: number;
+  orders: Order[];
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  resource: {
+    orderCount: number;
+    orders: Order[];
+  };
 }

@@ -16,6 +16,11 @@ export default function CartItem({ item }: CartItemProps) {
   const subtotal = displayPrice * quantity;
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
   const [inputValue, setInputValue] = React.useState(quantity.toString());
+  
+  // Check if product is out of stock
+  const isOutOfStock = product.stockQuantity !== undefined && product.stockQuantity === 0;
+  // Check if we can add more (current quantity in cart vs available stock)
+  const canAddMore = product.stockQuantity === undefined || quantity < product.stockQuantity;
 
   React.useEffect(() => {
     setInputValue(quantity.toString());
@@ -97,42 +102,67 @@ export default function CartItem({ item }: CartItemProps) {
 
         {/* Quantity controls and subtotal */}
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => updateQuantity(product.id, quantity - 1)}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 flex items-center justify-center transition-colors flex-shrink-0"
-              aria-label="Disminuir cantidad"
-            >
-              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-              </svg>
-            </button>
-            
-            <input
-              type="number"
-              min="1"
-              max="100"
-              value={inputValue}
-              onChange={handleInputChange}
-              onBlur={handleInputBlur}
-              className="w-12 sm:w-14 text-center text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none py-1"
-            />
-            
-            <button
-              onClick={() => updateQuantity(product.id, quantity + 1)}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white flex items-center justify-center transition-colors flex-shrink-0"
-              aria-label="Aumentar cantidad"
-            >
-              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-          </div>
+          {/* Out of Stock Warning */}
+          {isOutOfStock ? (
+            <div className="flex-1">
+              <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
+                <span className="text-sm">⚠️</span>
+                <span className="text-xs font-semibold">Sin stock</span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => updateQuantity(product.id, quantity - 1)}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 flex items-center justify-center transition-colors flex-shrink-0"
+                aria-label="Disminuir cantidad"
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                </svg>
+              </button>
+              
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={inputValue}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                disabled={isOutOfStock}
+                className="w-12 sm:w-14 text-center text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              
+              <button
+                onClick={() => updateQuantity(product.id, quantity + 1)}
+                disabled={!canAddMore}
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
+                  canAddMore
+                    ? 'bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white'
+                    : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                }`}
+                aria-label="Aumentar cantidad"
+                title={!canAddMore ? `Stock máximo: ${product.stockQuantity}` : 'Aumentar cantidad'}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+          )}
 
           <p className="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">
             ${subtotal.toFixed(2)}
           </p>
         </div>
+        
+        {/* Stock warning if quantity exceeds or equals stock */}
+        {product.stockQuantity !== undefined && quantity >= product.stockQuantity && !isOutOfStock && (
+          <div className="mt-2 flex items-center gap-1 text-orange-600 dark:text-orange-400">
+            <span className="text-xs">⚠️</span>
+            <span className="text-xs font-medium">Stock máximo alcanzado ({product.stockQuantity} disponibles)</span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ Globals:
       Variables:
         PRODUCTS_TABLE: !Ref ProductsTable
         ORDERS_TABLE: !Ref OrdersTable
+        WASTE_TABLE: !Ref WasteTable
         IMAGES_BUCKET: !Ref ImagesBucket
   Api:
     Cors:
@@ -49,9 +50,43 @@ Resources:
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
+        - AttributeName: deliveryDate
+          AttributeType: S
       KeySchema:
         - AttributeName: id
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: deliveryDate-index
+          KeySchema:
+            - AttributeName: deliveryDate
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+
+  WasteTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TheSecretRecipe-Waste
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: productId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: productId-timestamp-index
+          KeySchema:
+            - AttributeName: productId
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
 
   # S3 Bucket for Images
@@ -166,6 +201,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref OrdersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
 
   AIGeneratorFunction:
     Type: AWS::Serverless::Function
@@ -223,6 +260,127 @@ Resources:
         - S3CrudPolicy:
             BucketName: !Ref ImagesBucket
 
+  WasteManagementFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/waste-management/
+      Handler: index.handler
+      Timeout: 30
+      Events:
+        CreateWaste:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /waste
+            Method: POST
+        ListWaste:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /waste
+            Method: GET
+        GetWasteReport:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /waste/report
+            Method: GET
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WasteTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+
+  ProductionCalendarFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/production-calendar/
+      Handler: index.handler
+      Timeout: 30
+      Events:
+        GetCalendarOrders:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /calendar/orders
+            Method: GET
+        GetOrdersByDate:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /calendar/orders/{date}
+            Method: GET
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+              Resource:
+                - !Sub '${OrdersTable.Arn}/index/*'
+
+  BusinessAnalyticsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/business-analytics/
+      Handler: index.handler
+      Timeout: 60
+      Events:
+        GetProfitability:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /analytics/profitability
+            Method: GET
+        DemandForecast:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /analytics/demand-forecast
+            Method: POST
+        PriceRecommendations:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /analytics/price-recommendations
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource:
+                - 'arn:aws:bedrock:*::foundation-model/*'
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
@@ -233,6 +391,9 @@ Outputs:
   OrdersTableName:
     Description: DynamoDB Orders Table Name
     Value: !Ref OrdersTable
+  WasteTableName:
+    Description: DynamoDB Waste Table Name
+    Value: !Ref WasteTable
   ImagesBucketName:
     Description: S3 Images Bucket Name
     Value: !Ref ImagesBucket

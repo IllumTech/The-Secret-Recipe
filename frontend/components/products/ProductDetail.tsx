@@ -20,12 +20,17 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [mounted, setMounted] = useState(false);
   const { addItem } = useCart();
   const categoryEmoji = product.category === 'helado' ? '🍦' : '🍰';
+  
+  // Check if product is out of stock
+  const isOutOfStock = product.stockQuantity !== undefined && product.stockQuantity === 0;
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const handleAddToCart = () => {
+    // Prevent adding if out of stock
+    if (isOutOfStock) return;
     addItem(product, quantity);
     setToastQuantity(quantity);
     setShowToast(true);
@@ -185,12 +190,30 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
         {/* Controles de cantidad y botón */}
         <div className="space-y-2">
+          {/* Out of Stock Warning */}
+          {isOutOfStock && (
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-red-600 dark:text-red-400 text-lg">⚠️</span>
+                <span className="text-sm font-semibold text-red-800 dark:text-red-300">Producto Agotado</span>
+              </div>
+              <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+                Este producto no está disponible en este momento.
+              </p>
+            </div>
+          )}
+          
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Cantidad</span>
             <div className="flex items-center gap-2">
               <button
                 onClick={decrementQuantity}
-                className="w-8 h-8 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg font-bold text-lg text-gray-700 dark:text-gray-300 shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center"
+                disabled={isOutOfStock}
+                className={`w-8 h-8 rounded-lg font-bold text-lg shadow-sm transition-all duration-200 flex items-center justify-center ${
+                  isOutOfStock
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                    : 'bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 hover:shadow'
+                }`}
               >
                 −
               </button>
@@ -201,11 +224,21 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 value={inputValue}
                 onChange={handleInputChange}
                 onBlur={handleInputBlur}
-                className="w-16 text-center text-xl font-bold text-primary-600 dark:text-primary-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none py-1"
+                disabled={isOutOfStock}
+                className={`w-16 text-center text-xl font-bold rounded-lg border outline-none py-1 ${
+                  isOutOfStock
+                    ? 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                    : 'text-primary-600 dark:text-primary-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-500 focus:border-transparent'
+                }`}
               />
               <button
                 onClick={incrementQuantity}
-                className="w-8 h-8 bg-primary-500 dark:bg-primary-600 hover:bg-primary-600 dark:hover:bg-primary-700 rounded-lg font-bold text-lg text-white shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center"
+                disabled={isOutOfStock}
+                className={`w-8 h-8 rounded-lg font-bold text-lg shadow-sm transition-all duration-200 flex items-center justify-center ${
+                  isOutOfStock
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                    : 'bg-primary-500 dark:bg-primary-600 hover:bg-primary-600 dark:hover:bg-primary-700 text-white hover:shadow'
+                }`}
               >
                 +
               </button>
@@ -214,10 +247,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           <Button
             onClick={handleAddToCart}
+            disabled={isOutOfStock}
             className="w-full py-3 text-base flex items-center justify-center gap-2"
           >
-            <span>Agregar al Carrito</span>
-            <span className="text-lg">🛒</span>
+            <span>{isOutOfStock ? 'Sin Stock' : 'Agregar al Carrito'}</span>
+            <span className="text-lg">{isOutOfStock ? '⚠️' : '🛒'}</span>
           </Button>
         </div>
       </div>

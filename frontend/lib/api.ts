@@ -14,7 +14,12 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(error.error || `HTTP error! status: ${response.status}`);
+    const apiError: any = new Error(error.error || `HTTP error! status: ${response.status}`);
+    apiError.response = {
+      status: response.status,
+      data: error
+    };
+    throw apiError;
   }
 
   return response.json();
@@ -80,6 +85,9 @@ export async function createOrder(data: {
     quantity: number;
     image?: string;
   }>;
+  deliveryDate?: string;
+  deliveryTime?: string;
+  productionNotes?: string;
 }): Promise<Order> {
   return apiCall<Order>('/orders', {
     method: 'POST',
@@ -122,5 +130,94 @@ export async function uploadImage(file: File): Promise<{ imageUrl: string }> {
     
     reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
+  });
+}
+
+// Waste Management API
+export async function createWasteEntry(data: {
+  productId: string;
+  quantity: number;
+  reason: 'expired' | 'damaged' | 'other';
+  notes?: string;
+  timestamp: string;
+}): Promise<import('./types').WasteEntry> {
+  return apiCall<import('./types').WasteEntry>('/waste', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getWasteEntries(params?: {
+  startDate?: string;
+  endDate?: string;
+}): Promise<import('./types').WasteEntry[]> {
+  const queryString = params 
+    ? '?' + new URLSearchParams(params as Record<string, string>).toString()
+    : '';
+  return apiCall<import('./types').WasteEntry[]>(`/waste${queryString}`);
+}
+
+export async function getWasteReport(params?: {
+  month?: number;
+  year?: number;
+}): Promise<import('./types').WasteReport> {
+  const queryString = params 
+    ? '?' + new URLSearchParams(
+        Object.entries(params).reduce((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {} as Record<string, string>)
+      ).toString()
+    : '';
+  return apiCall<import('./types').WasteReport>(`/waste/report${queryString}`);
+}
+
+// Production Calendar API
+export async function getCalendarOrders(params?: {
+  startDate?: string;
+  endDate?: string;
+}): Promise<{
+  dates: string[];
+  ordersByDate: { [date: string]: Order[] };
+  orderCounts: { [date: string]: number };
+  totalOrders: number;
+}> {
+  const queryString = params 
+    ? '?' + new URLSearchParams(params as Record<string, string>).toString()
+    : '';
+  return apiCall(`/calendar/orders${queryString}`);
+}
+
+export async function getOrdersByDate(date: string): Promise<{
+  date: string;
+  orders: Order[];
+  count: number;
+}> {
+  return apiCall(`/calendar/orders/${date}`);
+}
+
+// Business Analytics API
+export async function getDemandForecast(): Promise<{
+  forecast: Array<{
+    product: string;
+    day: string;
+    quantity: number;
+  }>;
+}> {
+  return apiCall('/analytics/demand-forecast', {
+    method: 'POST',
+  });
+}
+
+export async function getPriceRecommendations(): Promise<{
+  recommendations: Array<{
+    product: string;
+    currentPrice: number;
+    suggestedPrice: number;
+    reason: string;
+  }>;
+}> {
+  return apiCall('/analytics/price-recommendations', {
+    method: 'POST',
   });
 }

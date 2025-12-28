@@ -23,6 +23,11 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
     imageUrl: product?.imageUrl || '',
     isOnPromotion: product?.isOnPromotion || false,
     promotionalPrice: product?.promotionalPrice || '',
+    // Business management fields
+    productionCost: product?.productionCost || '',
+    stockQuantity: product?.stockQuantity || '',
+    minStockAlert: product?.minStockAlert || '',
+    leadTimeHours: product?.leadTimeHours || '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,8 +43,31 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+    
+    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    // Real-time validation for business management fields
+    if (value !== '' && value !== undefined) {
+      const numValue = Number(value);
+      
+      if (name === 'productionCost' && (isNaN(numValue) || numValue <= 0)) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número positivo' }));
+      }
+      
+      if (name === 'stockQuantity' && (isNaN(numValue) || numValue < 0 || !Number.isInteger(numValue))) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número entero no negativo' }));
+      }
+      
+      if (name === 'minStockAlert' && (isNaN(numValue) || numValue <= 0 || !Number.isInteger(numValue))) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número entero positivo' }));
+      }
+      
+      if (name === 'leadTimeHours' && (isNaN(numValue) || numValue <= 0 || !Number.isInteger(numValue))) {
+        setErrors(prev => ({ ...prev, [name]: 'Debe ser un número entero positivo' }));
+      }
     }
   };
 
@@ -58,6 +86,35 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
       }
     }
     
+    // Business management fields validation - only validate if field has a value
+    if (formData.productionCost !== '' && formData.productionCost !== undefined) {
+      const cost = Number(formData.productionCost);
+      if (isNaN(cost) || cost <= 0) {
+        newErrors.productionCost = 'Debe ser un número positivo';
+      }
+    }
+    
+    if (formData.stockQuantity !== '' && formData.stockQuantity !== undefined) {
+      const stock = Number(formData.stockQuantity);
+      if (isNaN(stock) || stock < 0 || !Number.isInteger(stock)) {
+        newErrors.stockQuantity = 'Debe ser un número entero no negativo';
+      }
+    }
+    
+    if (formData.minStockAlert !== '' && formData.minStockAlert !== undefined) {
+      const alert = Number(formData.minStockAlert);
+      if (isNaN(alert) || alert <= 0 || !Number.isInteger(alert)) {
+        newErrors.minStockAlert = 'Debe ser un número entero positivo';
+      }
+    }
+    
+    if (formData.leadTimeHours !== '' && formData.leadTimeHours !== undefined) {
+      const leadTime = Number(formData.leadTimeHours);
+      if (isNaN(leadTime) || leadTime <= 0 || !Number.isInteger(leadTime)) {
+        newErrors.leadTimeHours = 'Debe ser un número entero positivo';
+      }
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -66,12 +123,30 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
     e.preventDefault();
     if (validate()) {
       // Prepare data for submission
-      const submitData = {
+      const submitData: any = {
         ...formData,
         price: Number(formData.price),
         // Only include promotionalPrice if promotion is enabled
         promotionalPrice: formData.isOnPromotion && formData.promotionalPrice ? Number(formData.promotionalPrice) : undefined,
       };
+
+      // Business management fields - only include if provided (not empty string)
+      if (formData.productionCost !== '' && formData.productionCost !== undefined) {
+        submitData.productionCost = Number(formData.productionCost);
+      }
+      
+      if (formData.stockQuantity !== '' && formData.stockQuantity !== undefined) {
+        submitData.stockQuantity = Number(formData.stockQuantity);
+      }
+      
+      if (formData.minStockAlert !== '' && formData.minStockAlert !== undefined) {
+        submitData.minStockAlert = Number(formData.minStockAlert);
+      }
+      
+      if (formData.leadTimeHours !== '' && formData.leadTimeHours !== undefined) {
+        submitData.leadTimeHours = Number(formData.leadTimeHours);
+      }
+
       onSubmit(submitData);
     }
   };
@@ -194,6 +269,138 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading }: 
           />
         </div>
         {errors.price && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.price}</p>}
+      </div>
+
+      {/* Business Management Section */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+          <span className="text-xl">📊</span>
+          <span>Gestión de Negocio (Opcional)</span>
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Production Cost */}
+          <div>
+            <label htmlFor="productionCost" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Costo de Producción
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-medium">$</span>
+              <Input
+                id="productionCost"
+                name="productionCost"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.productionCost}
+                onChange={handleChange}
+                placeholder="0.00"
+                disabled={isLoading}
+                className="pl-8 h-11"
+              />
+            </div>
+            {errors.productionCost && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.productionCost}</p>}
+          </div>
+
+          {/* Stock Quantity */}
+          <div>
+            <label htmlFor="stockQuantity" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Cantidad en Stock
+            </label>
+            <Input
+              id="stockQuantity"
+              name="stockQuantity"
+              type="number"
+              min="0"
+              step="1"
+              value={formData.stockQuantity}
+              onChange={handleChange}
+              placeholder="0"
+              disabled={isLoading}
+              className="h-11"
+            />
+            {errors.stockQuantity && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.stockQuantity}</p>}
+          </div>
+
+          {/* Min Stock Alert */}
+          <div>
+            <label htmlFor="minStockAlert" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Alerta de Stock Mínimo
+            </label>
+            <Input
+              id="minStockAlert"
+              name="minStockAlert"
+              type="number"
+              min="1"
+              step="1"
+              value={formData.minStockAlert}
+              onChange={handleChange}
+              placeholder="5"
+              disabled={isLoading}
+              className="h-11"
+            />
+            {errors.minStockAlert && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.minStockAlert}</p>}
+          </div>
+
+          {/* Lead Time Hours */}
+          <div>
+            <label htmlFor="leadTimeHours" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Tiempo de Anticipación (horas)
+            </label>
+            <Input
+              id="leadTimeHours"
+              name="leadTimeHours"
+              type="number"
+              min="1"
+              step="1"
+              value={formData.leadTimeHours}
+              onChange={handleChange}
+              placeholder="24"
+              disabled={isLoading}
+              className="h-11"
+            />
+            {errors.leadTimeHours && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.leadTimeHours}</p>}
+          </div>
+        </div>
+
+        {/* Contribution Margin Display */}
+        {formData.price && formData.productionCost && Number(formData.price) > 0 && Number(formData.productionCost) >= 0 && (
+          <div className="mt-4 bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-300 dark:border-green-700">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Margen de Contribución:</span>
+              <span className={`text-2xl font-bold ${
+                ((Number(formData.price) - Number(formData.productionCost)) / Number(formData.price)) * 100 < 0
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-green-600 dark:text-green-400'
+              }`}>
+                {(((Number(formData.price) - Number(formData.productionCost)) / Number(formData.price)) * 100).toFixed(2)}%
+              </span>
+            </div>
+            
+            {/* Warning for negative margin */}
+            {Number(formData.productionCost) > Number(formData.price) && (
+              <div className="flex items-start gap-2 mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-red-800 dark:text-red-300">⚠️ Rentabilidad Negativa</p>
+                  <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+                    El costo de producción es mayor que el precio de venta. Este producto genera pérdidas.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Info for promotional price */}
+            {formData.isOnPromotion && formData.promotionalPrice && Number(formData.promotionalPrice) > 0 && (
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
+                💡 Nota: El margen se calcula con el precio regular. Con precio promocional (${Number(formData.promotionalPrice).toFixed(2)}), 
+                el margen sería {(((Number(formData.promotionalPrice) - Number(formData.productionCost)) / Number(formData.promotionalPrice)) * 100).toFixed(2)}%
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Image Section */}

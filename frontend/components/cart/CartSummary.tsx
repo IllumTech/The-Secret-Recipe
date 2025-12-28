@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 
 export default function CartSummary() {
-  const { totalAmount, totalItems } = useCart();
+  const { totalAmount, totalItems, hasOutOfStockItems } = useCart();
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6 sticky top-4">
@@ -29,12 +29,32 @@ export default function CartSummary() {
         </div>
       </div>
 
-      <Link
-        href="/checkout"
-        className="block w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 text-white text-center font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl dark:shadow-purple-900/50 transform hover:-translate-y-0.5"
-      >
-        Proceder al Checkout
-      </Link>
+      {hasOutOfStockItems ? (
+        <div className="space-y-3">
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
+              <span>⚠️</span>
+              <span className="text-sm font-semibold">Productos sin stock</span>
+            </div>
+            <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+              Elimina los productos sin stock para continuar.
+            </p>
+          </div>
+          <button
+            disabled
+            className="block w-full py-3 px-6 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 text-center font-semibold rounded-lg cursor-not-allowed"
+          >
+            Proceder al Checkout
+          </button>
+        </div>
+      ) : (
+        <Link
+          href="/checkout"
+          className="block w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 text-white text-center font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl dark:shadow-purple-900/50 transform hover:-translate-y-0.5"
+        >
+          Proceder al Checkout
+        </Link>
+      )}
 
       <div className="mt-4 text-center">
         <Link
