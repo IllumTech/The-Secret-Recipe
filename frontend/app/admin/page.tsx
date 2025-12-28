@@ -1,6 +1,6 @@
 'use client';
 
-import { Package, ShoppingCart, TrendingUp, DollarSign, ArrowUpRight, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Package, ShoppingCart, TrendingUp, DollarSign, ArrowUpRight, Clock, CheckCircle, AlertCircle, Trash2, Calendar, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { useProducts } from '@/contexts/ProductContext';
 import useSWR from 'swr';
@@ -104,6 +104,34 @@ export default function AdminDashboard() {
             title="Ver Pedidos"
             description="Revisar pedidos"
             color="purple"
+          />
+          <QuickActionButton
+            href="/admin/rentabilidad"
+            icon={<TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />}
+            title="Rentabilidad"
+            description="Análisis de márgenes"
+            color="blue"
+          />
+          <QuickActionButton
+            href="/admin/mermas"
+            icon={<Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />}
+            title="Mermas"
+            description="Gestión de desperdicios"
+            color="green"
+          />
+          <QuickActionButton
+            href="/admin/calendario"
+            icon={<Calendar className="w-5 h-5 sm:w-6 sm:h-6" />}
+            title="Calendario"
+            description="Planificación de producción"
+            color="purple"
+          />
+          <QuickActionButton
+            href="/admin/analytics"
+            icon={<Brain className="w-5 h-5 sm:w-6 sm:h-6" />}
+            title="Analytics IA"
+            description="Predicciones y recomendaciones"
+            color="blue"
           />
         </div>
       </div>
