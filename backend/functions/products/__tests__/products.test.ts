@@ -23,30 +23,6 @@ jest.mock('@aws-sdk/lib-dynamodb', () => {
 
 // Import after mocks
 import { handler } from '../index';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { describe } from 'node:test';
-import { beforeEach } from 'node:test';
-import { describe } from 'node:test';
 
 describe('Products Lambda - Business Management Fields', () => {
   beforeEach(() => {
