@@ -195,3 +195,29 @@ export async function getOrdersByDate(date: string): Promise<{
 }> {
   return apiCall(`/calendar/orders/${date}`);
 }
+
+// Business Analytics API
+export async function getDemandForecast(): Promise<{
+  forecast: Array<{
+    product: string;
+    day: string;
+    quantity: number;
+  }>;
+}> {
+  return apiCall('/analytics/demand-forecast', {
+    method: 'POST',
+  });
+}
+
+export async function getPriceRecommendations(): Promise<{
+  recommendations: Array<{
+    product: string;
+    currentPrice: number;
+    suggestedPrice: number;
+    reason: string;
+  }>;
+}> {
+  return apiCall('/analytics/price-recommendations', {
+    method: 'POST',
+  });
+}
