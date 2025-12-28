@@ -336,6 +336,51 @@ Resources:
               Resource:
                 - !Sub '${OrdersTable.Arn}/index/*'
 
+  BusinessAnalyticsFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/business-analytics/
+      Handler: index.handler
+      Timeout: 60
+      Events:
+        GetProfitability:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /analytics/profitability
+            Method: GET
+        DemandForecast:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /analytics/demand-forecast
+            Method: POST
+        PriceRecommendations:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /analytics/price-recommendations
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource:
+                - 'arn:aws:bedrock:*::foundation-model/*'
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
