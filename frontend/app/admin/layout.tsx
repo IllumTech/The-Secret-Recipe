@@ -1,44 +1,191 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Package, ShoppingCart, LayoutDashboard, Menu, X, TrendingUp, Trash2, Calendar, Brain } from 'lucide-react';
+import { ShoppingBag, Package, ShoppingCart, LayoutDashboard, Menu, X, TrendingUp, Trash2, Calendar, Brain, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const SIDEBAR_STORAGE_KEY = 'admin-sidebar-collapsed';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Admin Header */}
-      <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-white shadow-xl border-b border-slate-700 dark:border-gray-800">
-        <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/admin" className="flex items-center space-x-2 sm:space-x-3 hover:opacity-80 transition-opacity">
-              <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
+  // Load sidebar state from localStorage after mount
+  useEffect(() => {
+    setMounted(true);
+    const savedState = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    if (savedState === 'true') {
+      setSidebarCollapsed(true);
+    }
+  }, []);
+
+  // Save sidebar state to localStorage whenever it changes
+  const toggleSidebar = () => {
+    const newState = !sidebarCollapsed;
+    setSidebarCollapsed(newState);
+    localStorage.setItem(SIDEBAR_STORAGE_KEY, String(newState));
+  };
+
+  // Prevent flash by not rendering until mounted
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
+        <aside className="hidden lg:flex flex-col bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-white shadow-2xl transition-all duration-300 relative w-64">
+          <div className="p-6 border-b border-slate-700 dark:border-gray-800">
+            <Link href="/admin" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+              <ShoppingBag className="w-8 h-8 text-blue-400 flex-shrink-0" />
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold">La Receta Secreta</h1>
-                <p className="text-xs sm:text-sm text-slate-400">Panel de Administración</p>
+                <h1 className="text-xl font-bold">La Receta Secreta</h1>
+                <p className="text-xs text-slate-400">Panel Admin</p>
               </div>
             </Link>
-            
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Link 
-                href="/" 
-                className="hidden sm:flex px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-xs sm:text-sm font-medium"
-              >
-                Ver Sitio Público
+          </div>
+          <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
+            {/* Placeholder during SSR */}
+          </nav>
+        </aside>
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
+          <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-white shadow-xl border-b border-slate-700 dark:border-gray-800">
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between">
+                <Link href="/admin" className="flex items-center space-x-2">
+                  <ShoppingBag className="w-6 h-6 text-blue-400" />
+                  <div>
+                    <h1 className="text-lg font-bold">La Receta Secreta</h1>
+                    <p className="text-xs text-slate-400">Panel Admin</p>
+                  </div>
+                </Link>
+                <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors">
+                  <Menu className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+          </header>
+        </div>
+        <div className="flex-1 flex flex-col min-h-screen">
+          <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-8 mt-16 lg:mt-0">
+            {children}
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
+      {/* Sidebar - Desktop */}
+      <aside className={`hidden lg:flex flex-col bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-white shadow-2xl transition-all duration-300 relative ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+        {/* Logo Section */}
+        <div className="p-6 border-b border-slate-700 dark:border-gray-800">
+          <Link href="/admin" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <ShoppingBag className="w-8 h-8 text-blue-400 flex-shrink-0" />
+            {!sidebarCollapsed && (
+              <div>
+                <h1 className="text-xl font-bold">La Receta Secreta</h1>
+                <p className="text-xs text-slate-400">Panel Admin</p>
+              </div>
+            )}
+          </Link>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
+          <SidebarLink 
+            href="/admin" 
+            icon={<LayoutDashboard className="w-5 h-5" />}
+            active={pathname === '/admin'}
+            collapsed={sidebarCollapsed}
+          >
+            Dashboard
+          </SidebarLink>
+          <SidebarLink 
+            href="/admin/productos" 
+            icon={<Package className="w-5 h-5" />}
+            active={pathname.startsWith('/admin/productos')}
+            collapsed={sidebarCollapsed}
+          >
+            Productos
+          </SidebarLink>
+          <SidebarLink 
+            href="/admin/pedidos" 
+            icon={<ShoppingCart className="w-5 h-5" />}
+            active={pathname.startsWith('/admin/pedidos')}
+            collapsed={sidebarCollapsed}
+          >
+            Pedidos
+          </SidebarLink>
+          <SidebarLink 
+            href="/admin/rentabilidad" 
+            icon={<TrendingUp className="w-5 h-5" />}
+            active={pathname.startsWith('/admin/rentabilidad')}
+            collapsed={sidebarCollapsed}
+          >
+            Rentabilidad
+          </SidebarLink>
+          <SidebarLink 
+            href="/admin/mermas" 
+            icon={<Trash2 className="w-5 h-5" />}
+            active={pathname.startsWith('/admin/mermas')}
+            collapsed={sidebarCollapsed}
+          >
+            Mermas
+          </SidebarLink>
+          <SidebarLink 
+            href="/admin/calendario" 
+            icon={<Calendar className="w-5 h-5" />}
+            active={pathname.startsWith('/admin/calendario')}
+            collapsed={sidebarCollapsed}
+          >
+            Calendario
+          </SidebarLink>
+          <SidebarLink 
+            href="/admin/analytics" 
+            icon={<Brain className="w-5 h-5" />}
+            active={pathname.startsWith('/admin/analytics')}
+            collapsed={sidebarCollapsed}
+          >
+            Analytics IA
+          </SidebarLink>
+        </nav>
+
+        {/* Collapse Toggle Button - Floating */}
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-20 w-6 h-6 bg-slate-800 hover:bg-slate-700 border-2 border-slate-600 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-lg z-10"
+          aria-label="Toggle sidebar"
+          title={sidebarCollapsed ? "Expandir sidebar" : "Colapsar sidebar"}
+        >
+          {sidebarCollapsed ? (
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+          ) : (
+            <ChevronLeft className="w-3.5 h-3.5 text-slate-300" />
+          )}
+        </button>
+      </aside>
+
+      {/* Mobile Header & Menu */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
+        <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-white shadow-xl border-b border-slate-700 dark:border-gray-800">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <Link href="/admin" className="flex items-center space-x-2">
+                <ShoppingBag className="w-6 h-6 text-blue-400" />
+                <div>
+                  <h1 className="text-lg font-bold">La Receta Secreta</h1>
+                  <p className="text-xs text-slate-400">Panel Admin</p>
+                </div>
               </Link>
               
-              {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
@@ -49,142 +196,110 @@ export default function AdminLayout({
               </button>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Desktop Navigation */}
-      <nav className="hidden lg:block bg-white dark:bg-gray-800 shadow-md border-b border-slate-200 dark:border-gray-700">
-        <div className="container mx-auto px-4">
-          <div className="flex space-x-1">
-            <NavLink href="/admin" icon={<LayoutDashboard className="w-5 h-5" />} active={pathname === '/admin'}>
-              Dashboard
-            </NavLink>
-            <NavLink href="/admin/productos" icon={<Package className="w-5 h-5" />} active={pathname.startsWith('/admin/productos')}>
-              Productos
-            </NavLink>
-            <NavLink href="/admin/pedidos" icon={<ShoppingCart className="w-5 h-5" />} active={pathname.startsWith('/admin/pedidos')}>
-              Pedidos
-            </NavLink>
-            <NavLink href="/admin/rentabilidad" icon={<TrendingUp className="w-5 h-5" />} active={pathname.startsWith('/admin/rentabilidad')}>
-              Rentabilidad
-            </NavLink>
-            <NavLink href="/admin/mermas" icon={<Trash2 className="w-5 h-5" />} active={pathname.startsWith('/admin/mermas')}>
-              Mermas
-            </NavLink>
-            <NavLink href="/admin/calendario" icon={<Calendar className="w-5 h-5" />} active={pathname.startsWith('/admin/calendario')}>
-              Calendario
-            </NavLink>
-            <NavLink href="/admin/analytics" icon={<Brain className="w-5 h-5" />} active={pathname.startsWith('/admin/analytics')}>
-              Analytics IA
-            </NavLink>
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="bg-white dark:bg-gray-800 border-b border-slate-200 dark:border-gray-700 shadow-lg">
+            <nav className="px-4 py-3">
+              <div className="flex flex-col space-y-1">
+                <MobileNavLink 
+                  href="/admin" 
+                  icon={<LayoutDashboard className="w-5 h-5" />}
+                  active={pathname === '/admin'}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </MobileNavLink>
+                <MobileNavLink 
+                  href="/admin/productos" 
+                  icon={<Package className="w-5 h-5" />}
+                  active={pathname.startsWith('/admin/productos')}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Productos
+                </MobileNavLink>
+                <MobileNavLink 
+                  href="/admin/pedidos" 
+                  icon={<ShoppingCart className="w-5 h-5" />}
+                  active={pathname.startsWith('/admin/pedidos')}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Pedidos
+                </MobileNavLink>
+                <MobileNavLink 
+                  href="/admin/rentabilidad" 
+                  icon={<TrendingUp className="w-5 h-5" />}
+                  active={pathname.startsWith('/admin/rentabilidad')}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Rentabilidad
+                </MobileNavLink>
+                <MobileNavLink 
+                  href="/admin/mermas" 
+                  icon={<Trash2 className="w-5 h-5" />}
+                  active={pathname.startsWith('/admin/mermas')}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Mermas
+                </MobileNavLink>
+                <MobileNavLink 
+                  href="/admin/calendario" 
+                  icon={<Calendar className="w-5 h-5" />}
+                  active={pathname.startsWith('/admin/calendario')}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Calendario
+                </MobileNavLink>
+                <MobileNavLink 
+                  href="/admin/analytics" 
+                  icon={<Brain className="w-5 h-5" />}
+                  active={pathname.startsWith('/admin/analytics')}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Analytics IA
+                </MobileNavLink>
+              </div>
+            </nav>
           </div>
-        </div>
-      </nav>
+        )}
+      </div>
 
-      {/* Mobile Navigation Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-slate-200 dark:border-gray-700 shadow-lg animate-fade-in">
-          <nav className="container mx-auto px-4 py-3">
-            <div className="flex flex-col space-y-1">
-              <MobileNavLink 
-                href="/admin" 
-                icon={<LayoutDashboard className="w-5 h-5" />}
-                active={pathname === '/admin'}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Dashboard
-              </MobileNavLink>
-              <MobileNavLink 
-                href="/admin/productos" 
-                icon={<Package className="w-5 h-5" />}
-                active={pathname.startsWith('/admin/productos')}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Productos
-              </MobileNavLink>
-              <MobileNavLink 
-                href="/admin/pedidos" 
-                icon={<ShoppingCart className="w-5 h-5" />}
-                active={pathname.startsWith('/admin/pedidos')}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Pedidos
-              </MobileNavLink>
-              <MobileNavLink 
-                href="/admin/rentabilidad" 
-                icon={<TrendingUp className="w-5 h-5" />}
-                active={pathname.startsWith('/admin/rentabilidad')}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Rentabilidad
-              </MobileNavLink>
-              <MobileNavLink 
-                href="/admin/mermas" 
-                icon={<Trash2 className="w-5 h-5" />}
-                active={pathname.startsWith('/admin/mermas')}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Mermas
-              </MobileNavLink>
-              <MobileNavLink 
-                href="/admin/calendario" 
-                icon={<Calendar className="w-5 h-5" />}
-                active={pathname.startsWith('/admin/calendario')}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Calendario
-              </MobileNavLink>
-              <MobileNavLink 
-                href="/admin/analytics" 
-                icon={<Brain className="w-5 h-5" />}
-                active={pathname.startsWith('/admin/analytics')}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Analytics IA
-              </MobileNavLink>
-              <Link 
-                href="/" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                <span>Ver Sitio Público</span>
-              </Link>
-            </div>
-          </nav>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <main className="container mx-auto px-0 sm:px-4 py-4 sm:py-8">
-        {children}
-      </main>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-8 mt-16 lg:mt-0">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
 
-function NavLink({ 
+function SidebarLink({ 
   href, 
   icon, 
   children,
-  active
+  active,
+  collapsed
 }: { 
   href: string; 
   icon: React.ReactNode; 
   children: React.ReactNode;
   active: boolean;
+  collapsed: boolean;
 }) {
   return (
     <Link
       href={href}
-      className={`flex items-center space-x-2 px-6 py-4 font-medium transition-all ${
+      className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all group ${
         active
-          ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border-b-2 border-blue-600 dark:border-blue-400'
-          : 'text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400'
+          ? 'bg-blue-600 text-white shadow-lg'
+          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
       }`}
+      title={collapsed ? children as string : undefined}
     >
-      {icon}
-      <span>{children}</span>
+      <span className="flex-shrink-0">{icon}</span>
+      {!collapsed && <span className="truncate">{children}</span>}
     </Link>
   );
 }
