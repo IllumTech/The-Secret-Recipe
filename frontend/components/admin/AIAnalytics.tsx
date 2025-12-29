@@ -284,7 +284,7 @@ export default function AIAnalytics() {
                   <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
                     <Search className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
                     <p className="text-slate-600 dark:text-slate-400">
-                      No se encontraron productos que coincidan con "{forecastSearchTerm}"
+                      No se encontraron productos que coincidan con &quot;{forecastSearchTerm}&quot;
                     </p>
                   </div>
                 );
@@ -449,7 +449,7 @@ export default function AIAnalytics() {
           <div className="text-center py-12">
             <TrendingUp className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
             <p className="text-slate-600 dark:text-slate-400">
-              Haz clic en "Solicitar Pronóstico" para obtener predicciones de demanda
+              Haz clic en &quot;Solicitar Pronóstico&quot; para obtener predicciones de demanda
             </p>
           </div>
         )}
@@ -580,7 +580,7 @@ export default function AIAnalytics() {
                     <Search className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
                     <p className="text-slate-600 dark:text-slate-400">
                       {recommendationsSearchTerm 
-                        ? `No se encontraron productos que coincidan con "${recommendationsSearchTerm}"`
+                        ? <>No se encontraron productos que coincidan con &quot;{recommendationsSearchTerm}&quot;</>
                         : 'No hay recomendaciones que coincidan con el filtro seleccionado'
                       }
                     </p>
@@ -765,7 +765,7 @@ export default function AIAnalytics() {
           <div className="text-center py-12">
             <DollarSign className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
             <p className="text-slate-600 dark:text-slate-400">
-              Haz clic en "Solicitar Recomendaciones" para obtener sugerencias de precios
+              Haz clic en &quot;Solicitar Recomendaciones&quot; para obtener sugerencias de precios
             </p>
           </div>
         )}

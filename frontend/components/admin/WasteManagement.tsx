@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Product, WasteEntry, WasteReport } from '@/lib/types';
 import { getProducts, createWasteEntry, getWasteEntries, getWasteReport } from '@/lib/api';
 import { Trash2, AlertCircle, TrendingDown, Calendar, DollarSign, Package, Plus } from 'lucide-react';
@@ -34,17 +34,7 @@ export default function WasteManagement() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  useEffect(() => {
-    loadProducts();
-    loadWasteEntries();
-    loadWasteReport();
-  }, []);
-
-  useEffect(() => {
-    loadWasteReport();
-  }, [selectedMonth, selectedYear]);
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     try {
       const allProducts = await getProducts();
       // Filter active products with production cost
@@ -55,9 +45,9 @@ export default function WasteManagement() {
     } catch (err) {
       console.error('Error loading products:', err);
     }
-  };
+  }, []);
 
-  const loadWasteEntries = async () => {
+  const loadWasteEntries = useCallback(async () => {
     try {
       setHistoryLoading(true);
       setHistoryError(null);
@@ -69,9 +59,9 @@ export default function WasteManagement() {
     } finally {
       setHistoryLoading(false);
     }
-  };
+  }, [startDate, endDate]);
 
-  const loadWasteReport = async () => {
+  const loadWasteReport = useCallback(async () => {
     try {
       setReportLoading(true);
       setReportError(null);
@@ -82,7 +72,17 @@ export default function WasteManagement() {
     } finally {
       setReportLoading(false);
     }
-  };
+  }, [selectedMonth, selectedYear]);
+
+  useEffect(() => {
+    loadProducts();
+    loadWasteEntries();
+    loadWasteReport();
+  }, [loadProducts, loadWasteEntries, loadWasteReport]);
+
+  useEffect(() => {
+    loadWasteReport();
+  }, [loadWasteReport]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
