@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Package, ShoppingCart, LayoutDashboard, Menu, X, TrendingUp, Trash2, Calendar, Brain, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Package, ShoppingCart, LayoutDashboard, Menu, X, TrendingUp, Trash2, Calendar, Brain, ChevronLeft, ChevronRight, Receipt } from 'lucide-react';
 
 const SIDEBAR_STORAGE_KEY = 'admin-sidebar-collapsed';
 
@@ -138,6 +138,14 @@ export default function AdminLayout({
             Mermas
           </SidebarLink>
           <SidebarLink 
+            href="/admin/compras" 
+            icon={<Receipt className="w-5 h-5" />}
+            active={pathname.startsWith('/admin/compras')}
+            collapsed={sidebarCollapsed}
+          >
+            Compras
+          </SidebarLink>
+          <SidebarLink 
             href="/admin/calendario" 
             icon={<Calendar className="w-5 h-5" />}
             active={pathname.startsWith('/admin/calendario')}
@@ -242,6 +250,14 @@ export default function AdminLayout({
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Mermas
+                </MobileNavLink>
+                <MobileNavLink 
+                  href="/admin/compras" 
+                  icon={<Receipt className="w-5 h-5" />}
+                  active={pathname.startsWith('/admin/compras')}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Compras
                 </MobileNavLink>
                 <MobileNavLink 
                   href="/admin/calendario" 

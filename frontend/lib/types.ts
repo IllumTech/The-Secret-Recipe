@@ -91,3 +91,53 @@ export interface CalendarEvent {
     orders: Order[];
   };
 }
+
+// Purchase types for the purchase invoices module
+export type PurchaseCategory = 'ingredientes' | 'empaque' | 'decoracion' | 'equipo' | 'otros';
+
+export interface Purchase {
+  id: string;
+  amount: number;
+  purchaseDate: string;
+  description: string;
+  category: PurchaseCategory;
+  receiptImageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePurchaseInput {
+  amount: number;
+  purchaseDate: string;
+  description: string;
+  category: PurchaseCategory;
+  receiptImageUrl?: string;
+}
+
+export interface UpdatePurchaseInput {
+  amount?: number;
+  purchaseDate?: string;
+  description?: string;
+  category?: PurchaseCategory;
+  receiptImageUrl?: string;
+}
+
+export interface PurchaseFilters {
+  startDate?: string;
+  endDate?: string;
+  category?: PurchaseCategory;
+}
+
+export interface PurchaseReport {
+  month: number;
+  year: number;
+  totalAmount: number;
+  purchaseCount: number;
+  byCategory: Array<{
+    category: PurchaseCategory;
+    totalAmount: number;
+    count: number;
+  }>;
+  startDate: string;
+  endDate: string;
+}
