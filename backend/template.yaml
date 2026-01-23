@@ -12,6 +12,7 @@ Globals:
         PRODUCTS_TABLE: !Ref ProductsTable
         ORDERS_TABLE: !Ref OrdersTable
         WASTE_TABLE: !Ref WasteTable
+        PURCHASES_TABLE: !Ref PurchasesTable
         IMAGES_BUCKET: !Ref ImagesBucket
   Api:
     Cors:
@@ -85,6 +86,27 @@ Resources:
               KeyType: HASH
             - AttributeName: timestamp
               KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+
+  PurchasesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TheSecretRecipe-Purchases
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: purchaseDate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: purchaseDate-index
+          KeySchema:
+            - AttributeName: purchaseDate
+              KeyType: HASH
           Projection:
             ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
@@ -381,6 +403,61 @@ Resources:
               Resource:
                 - 'arn:aws:bedrock:*::foundation-model/*'
 
+  PurchasesFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints: 
+          - index.ts
+    Properties:
+      CodeUri: functions/purchases/
+      Handler: index.handler
+      Timeout: 30
+      Events:
+        CreatePurchase:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /purchases
+            Method: POST
+        ListPurchases:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /purchases
+            Method: GET
+        GetPurchaseReport:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /purchases/report
+            Method: GET
+        GetPurchase:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /purchases/{id}
+            Method: GET
+        UpdatePurchase:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /purchases/{id}
+            Method: PUT
+        DeletePurchase:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TheSecretRecipeApi
+            Path: /purchases/{id}
+            Method: DELETE
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PurchasesTable
+
 Outputs:
   ApiUrl:
     Description: API Gateway endpoint URL
@@ -394,6 +471,9 @@ Outputs:
   WasteTableName:
     Description: DynamoDB Waste Table Name
     Value: !Ref WasteTable
+  PurchasesTableName:
+    Description: DynamoDB Purchases Table Name
+    Value: !Ref PurchasesTable
   ImagesBucketName:
     Description: S3 Images Bucket Name
     Value: !Ref ImagesBucket
