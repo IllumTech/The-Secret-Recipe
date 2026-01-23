@@ -24,6 +24,8 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const VALID_CATEGORIES: { value: PurchaseCategory; label: string }[] = [
   { value: 'ingredientes', label: 'Ingredientes' },
@@ -40,8 +42,8 @@ export default function PurchaseManagement() {
   const [listError, setListError] = useState<string | null>(null);
 
   // State for filters
-  const [filterStartDate, setFilterStartDate] = useState('');
-  const [filterEndDate, setFilterEndDate] = useState('');
+  const [filterStartDate, setFilterStartDate] = useState<Date | null>(null);
+  const [filterEndDate, setFilterEndDate] = useState<Date | null>(null);
   const [filterCategory, setFilterCategory] = useState<PurchaseCategory | ''>('');
 
   // State for form modal
@@ -53,7 +55,7 @@ export default function PurchaseManagement() {
 
   // Form fields
   const [formAmount, setFormAmount] = useState('');
-  const [formDate, setFormDate] = useState('');
+  const [formDate, setFormDate] = useState<Date | null>(null);
   const [formDescription, setFormDescription] = useState('');
   const [formCategory, setFormCategory] = useState<PurchaseCategory>('ingredientes');
   const [formImageUrl, setFormImageUrl] = useState('');
@@ -81,8 +83,8 @@ export default function PurchaseManagement() {
       setListLoading(true);
       setListError(null);
       const filters: { startDate?: string; endDate?: string; category?: PurchaseCategory } = {};
-      if (filterStartDate) filters.startDate = filterStartDate;
-      if (filterEndDate) filters.endDate = filterEndDate;
+      if (filterStartDate) filters.startDate = filterStartDate.toISOString().split('T')[0];
+      if (filterEndDate) filters.endDate = filterEndDate.toISOString().split('T')[0];
       if (filterCategory) filters.category = filterCategory;
       
       const data = await getPurchases(Object.keys(filters).length > 0 ? filters : undefined);
@@ -118,7 +120,7 @@ export default function PurchaseManagement() {
 
   const resetForm = () => {
     setFormAmount('');
-    setFormDate('');
+    setFormDate(null);
     setFormDescription('');
     setFormCategory('ingredientes');
     setFormImageUrl('');
@@ -129,14 +131,14 @@ export default function PurchaseManagement() {
 
   const openCreateModal = () => {
     resetForm();
-    setFormDate(new Date().toISOString().split('T')[0]);
+    setFormDate(new Date());
     setIsFormModalOpen(true);
   };
 
   const openEditModal = (purchase: Purchase) => {
     setEditingPurchase(purchase);
     setFormAmount(purchase.amount.toString());
-    setFormDate(purchase.purchaseDate.split('T')[0]);
+    setFormDate(new Date(purchase.purchaseDate));
     setFormDescription(purchase.description);
     setFormCategory(purchase.category);
     setFormImageUrl(purchase.receiptImageUrl || '');
@@ -198,7 +200,7 @@ export default function PurchaseManagement() {
       if (editingPurchase) {
         const updateData: UpdatePurchaseInput = {
           amount,
-          purchaseDate: formDate,
+          purchaseDate: formDate!.toISOString().split('T')[0],
           description: formDescription.trim(),
           category: formCategory,
         };
@@ -208,7 +210,7 @@ export default function PurchaseManagement() {
       } else {
         const createData: CreatePurchaseInput = {
           amount,
-          purchaseDate: formDate,
+          purchaseDate: formDate!.toISOString().split('T')[0],
           description: formDescription.trim(),
           category: formCategory,
         };
@@ -248,10 +250,6 @@ export default function PurchaseManagement() {
     }
   };
 
-  const handleApplyFilters = () => {
-    loadPurchases();
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -261,7 +259,7 @@ export default function PurchaseManagement() {
   };
 
   const formatCurrency = (amount: number) => {
-    return `$${amount.toFixed(2)}`;
+    return `$${amount.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   };
 
   const getCategoryLabel = (category: PurchaseCategory) => {
@@ -306,34 +304,46 @@ export default function PurchaseManagement() {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters and Purchases Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-          Filtros de Búsqueda
+        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
+          <Calendar className="w-5 h-5 mr-2" />
+          Historial de Compras
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div>
             <label htmlFor="filterStartDate" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Fecha Inicio
             </label>
-            <input
-              type="date"
-              id="filterStartDate"
-              value={filterStartDate}
-              onChange={(e) => setFilterStartDate(e.target.value)}
+            <DatePicker
+              selected={filterStartDate}
+              onChange={(date: Date | null) => setFilterStartDate(date)}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Selecciona fecha"
+              maxDate={new Date()}
               className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
+              calendarClassName="shadow-xl"
+              wrapperClassName="w-full"
+              isClearable
             />
           </div>
           <div>
             <label htmlFor="filterEndDate" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Fecha Fin
             </label>
-            <input
-              type="date"
-              id="filterEndDate"
-              value={filterEndDate}
-              onChange={(e) => setFilterEndDate(e.target.value)}
+            <DatePicker
+              selected={filterEndDate}
+              onChange={(date: Date | null) => setFilterEndDate(date)}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Selecciona fecha"
+              minDate={filterStartDate || undefined}
+              maxDate={new Date()}
               className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
+              calendarClassName="shadow-xl"
+              wrapperClassName="w-full"
+              isClearable
             />
           </div>
           <div>
@@ -352,23 +362,7 @@ export default function PurchaseManagement() {
               ))}
             </select>
           </div>
-          <div className="flex items-end">
-            <button
-              onClick={handleApplyFilters}
-              className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-            >
-              Aplicar Filtros
-            </button>
-          </div>
         </div>
-      </div>
-
-      {/* Purchases Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
-          <Calendar className="w-5 h-5 mr-2" />
-          Historial de Compras
-        </h3>
 
         {listLoading && (
           <div className="flex items-center justify-center py-12">
@@ -492,11 +486,19 @@ export default function PurchaseManagement() {
               onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
               className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
             >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                <option key={month} value={month}>
-                  {new Date(2024, month - 1).toLocaleDateString('es-ES', { month: 'long' })}
-                </option>
-              ))}
+              {Array.from({ length: 12 }, (_, i) => i + 1)
+                .filter(month => {
+                  const currentYear = new Date().getFullYear();
+                  const currentMonth = new Date().getMonth() + 1;
+                  if (selectedYear < currentYear) return true;
+                  if (selectedYear === currentYear) return month <= currentMonth;
+                  return false;
+                })
+                .map(month => (
+                  <option key={month} value={month}>
+                    {new Date(2024, month - 1).toLocaleDateString('es-ES', { month: 'long' })}
+                  </option>
+                ))}
             </select>
           </div>
           <div>
@@ -655,36 +657,41 @@ export default function PurchaseManagement() {
         title={editingPurchase ? 'Editar Compra' : 'Nueva Compra'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="formAmount" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Monto Total *
-            </label>
-            <input
-              type="number"
-              id="formAmount"
-              value={formAmount}
-              onChange={(e) => setFormAmount(e.target.value)}
-              min="0.01"
-              step="0.01"
-              className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
-              placeholder="0.00"
-              required
-            />
-          </div>
+          {/* Monto y Fecha en una fila */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="formAmount" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Monto Total *
+              </label>
+              <input
+                type="number"
+                id="formAmount"
+                value={formAmount}
+                onChange={(e) => setFormAmount(e.target.value)}
+                min="0.01"
+                step="0.01"
+                className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
+                placeholder="0.00"
+                required
+              />
+            </div>
 
-          <div>
-            <label htmlFor="formDate" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Fecha de Compra *
-            </label>
-            <input
-              type="date"
-              id="formDate"
-              value={formDate}
-              onChange={(e) => setFormDate(e.target.value)}
-              max={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
-              required
-            />
+            <div>
+              <label htmlFor="formDate" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Fecha de Compra *
+              </label>
+              <DatePicker
+                selected={formDate}
+                onChange={(date: Date | null) => setFormDate(date)}
+                dateFormat="dd/MM/yyyy"
+                maxDate={new Date()}
+                placeholderText="Selecciona fecha"
+                className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
+                calendarClassName="shadow-xl"
+                wrapperClassName="w-full"
+                required
+              />
+            </div>
           </div>
 
           <div>
@@ -704,32 +711,33 @@ export default function PurchaseManagement() {
             </select>
           </div>
 
-          <div>
-            <label htmlFor="formDescription" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Descripción *
-            </label>
-            <textarea
-              id="formDescription"
-              value={formDescription}
-              onChange={(e) => setFormDescription(e.target.value)}
-              rows={3}
-              className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white"
-              placeholder="Describe los insumos comprados..."
-              required
-            />
-          </div>
+          {/* Descripción y Comprobante en una fila */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="formDescription" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Descripción *
+              </label>
+              <textarea
+                id="formDescription"
+                value={formDescription}
+                onChange={(e) => setFormDescription(e.target.value)}
+                rows={4}
+                className="w-full px-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white resize-none"
+                placeholder="Describe los insumos comprados..."
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Comprobante (opcional)
-            </label>
-            <div className="space-y-2">
-              {formImageUrl && (
-                <div className="relative inline-block">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Comprobante (opcional)
+              </label>
+              {formImageUrl ? (
+                <div className="relative h-[104px]">
                   <img 
                     src={formImageUrl} 
                     alt="Comprobante" 
-                    className="h-24 w-auto rounded-lg border border-slate-300 dark:border-gray-600"
+                    className="h-full w-full object-cover rounded-lg border border-slate-300 dark:border-gray-600"
                   />
                   <button
                     type="button"
@@ -739,27 +747,28 @@ export default function PurchaseManagement() {
                     <X className="w-3 h-3" />
                   </button>
                 </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center h-[104px] border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={imageUploading}
+                  />
+                  {imageUploading ? (
+                    <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                      <span>Subiendo...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center text-slate-600 dark:text-slate-400">
+                      <Upload className="w-6 h-6 mb-1" />
+                      <span className="text-sm">Subir comprobante</span>
+                    </div>
+                  )}
+                </label>
               )}
-              <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  disabled={imageUploading}
-                />
-                {imageUploading ? (
-                  <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                    <span>Subiendo...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
-                    <Upload className="w-5 h-5" />
-                    <span>{formImageUrl ? 'Cambiar imagen' : 'Subir comprobante'}</span>
-                  </div>
-                )}
-              </label>
             </div>
           </div>
 
