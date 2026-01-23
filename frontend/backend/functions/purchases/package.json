@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "the-secret-recipe-frontend": "file:../../.."
+  }
+}

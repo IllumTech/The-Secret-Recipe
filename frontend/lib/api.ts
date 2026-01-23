@@ -1,4 +1,4 @@
-import { Product, Order } from './types';
+import { Product, Order, Purchase, CreatePurchaseInput, UpdatePurchaseInput, PurchaseFilters, PurchaseReport } from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -220,4 +220,56 @@ export async function getPriceRecommendations(): Promise<{
   return apiCall('/analytics/price-recommendations', {
     method: 'POST',
   });
+}
+
+// Purchases API
+export async function createPurchase(data: CreatePurchaseInput): Promise<Purchase> {
+  return apiCall<Purchase>('/purchases', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getPurchases(filters?: PurchaseFilters): Promise<Purchase[]> {
+  const params: Record<string, string> = {};
+  if (filters?.startDate) params.startDate = filters.startDate;
+  if (filters?.endDate) params.endDate = filters.endDate;
+  if (filters?.category) params.category = filters.category;
+  
+  const queryString = Object.keys(params).length > 0
+    ? '?' + new URLSearchParams(params).toString()
+    : '';
+  return apiCall<Purchase[]>(`/purchases${queryString}`);
+}
+
+export async function getPurchase(id: string): Promise<Purchase> {
+  return apiCall<Purchase>(`/purchases/${id}`);
+}
+
+export async function updatePurchase(id: string, data: UpdatePurchaseInput): Promise<Purchase> {
+  return apiCall<Purchase>(`/purchases/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deletePurchase(id: string): Promise<{ message: string }> {
+  return apiCall<{ message: string }>(`/purchases/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function getPurchaseReport(params?: {
+  month?: number;
+  year?: number;
+}): Promise<PurchaseReport> {
+  const queryString = params 
+    ? '?' + new URLSearchParams(
+        Object.entries(params).reduce((acc, [key, value]) => {
+          acc[key] = String(value);
+          return acc;
+        }, {} as Record<string, string>)
+      ).toString()
+    : '';
+  return apiCall<PurchaseReport>(`/purchases/report${queryString}`);
 }
